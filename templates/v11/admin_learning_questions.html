@@ -1,19 +1,430 @@
-{% extends 'base.html' %}{% block title %}Question bank · KIZA-AGRI{% endblock %}{% block body %}
+{% extends 'base.html' %}
+
+{% block title %}Question Bank · KIZA-AGRI{% endblock %}
+
+{% block body %}
 <style>
-.learn-admin{max-width:1120px;margin:auto}.learn-hero{padding:28px;border-radius:22px;background:linear-gradient(120deg,#073d29,#16734b);color:white;margin-bottom:18px}.learn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}.learn-admin .card{padding:20px;border:1px solid var(--line,#ddd);border-radius:18px}.learn-admin input,.learn-admin select,.learn-admin textarea{width:100%;padding:11px;border:1px solid #ccd7cf;border-radius:10px;margin:5px 0 12px}.learn-admin label{font-weight:700}.qrow{padding:14px 0;border-bottom:1px solid #e5e9e5}.pill-ok{color:#087443;font-weight:800}.pill-wait{color:#9a5c00;font-weight:800}
+  :root {
+    --primary: #075e3a;
+    --primary-hover: #04442a;
+    --primary-light: #e8f5e9;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --bg-card: #ffffff;
+    --status-ok-bg: #dcfce7;
+    --status-ok-text: #15803d;
+    --status-wait-bg: #fef3c7;
+    --status-wait-text: #b45309;
+  }
+
+  .admin-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    font-family: inherit;
+    color: var(--text-main);
+  }
+
+  /* Hero Section */
+  .hero-banner {
+    background: linear-gradient(135deg, #073d29 0%, #16734b 100%);
+    color: #ffffff;
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(7, 61, 41, 0.15);
+  }
+
+  .hero-banner h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-banner p {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    max-width: 800px;
+    line-height: 1.5;
+  }
+
+  /* Main Grid Layout */
+  .admin-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 900px) {
+    .admin-grid {
+      grid-template-columns: 1.6fr 1fr;
+    }
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+  }
+
+  /* Form Elements */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-main);
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fafafa;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(7, 94, 58, 0.1);
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  @media (min-width: 600px) {
+    .options-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* Correct Answer Radio Selector */
+  .radio-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .radio-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    background: #fafafa;
+    transition: all 0.2s;
+  }
+
+  .radio-label:hover {
+    background: var(--primary-light);
+  }
+
+  .radio-label input[type="radio"] {
+    accent-color: var(--primary);
+  }
+
+  /* Guidelines Card */
+  .guidelines-list {
+    padding-left: 20px;
+    margin: 0 0 20px 0;
+  }
+
+  .guidelines-list li {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.4;
+  }
+
+  .cert-info {
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    padding: 14px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.875rem;
+  }
+
+  /* Action Buttons */
+  .btn-submit {
+    width: 100%;
+    background-color: var(--primary);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn-submit:hover {
+    background-color: var(--primary-hover);
+  }
+
+  .btn-action {
+    background-color: #f3f4f6;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-action:hover {
+    background-color: #e5e7eb;
+  }
+
+  /* Questions List Section */
+  .questions-section {
+    margin-top: 24px;
+  }
+
+  .question-item {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .question-item:last-child {
+    border-bottom: none;
+  }
+
+  .question-text {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .options-preview {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .meta-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .meta-info a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .meta-info a:hover {
+    text-decoration: underline;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .badge-success {
+    background-color: var(--status-ok-bg);
+    color: var(--status-ok-text);
+  }
+
+  .badge-warning {
+    background-color: var(--status-wait-bg);
+    color: var(--status-wait-text);
+  }
 </style>
-<div class="learn-admin"><div class="learn-hero"><h1>🎓 Ikigo cy'ibizamini n'impamyabumenyi</h1><p>Admin yongeramo ibibazo bifite inkomoko y'amakuru. Ikibazo ntikigaragara mu kizamini kugeza gisuzumwe kandi cyemejwe.</p></div>
-<div class="learn-grid"><section class="card"><h2>➕ Ongeramo ikibazo</h2><form method="post">{{ csrf_input() }}
-<label>Isomo</label><select name="course_id" required>{% for c in courses %}<option value="{{ c.id }}">{{ c.rw }} / {{ c.en }}</option>{% endfor %}</select>
-<label>Ikibazo mu Kinyarwanda</label><textarea name="question_rw" rows="3" required minlength="10" placeholder="Andika ikibazo gisobanutse..."></textarea>
-<label>Igisubizo A</label><input name="option" required>
-<label>Igisubizo B</label><input name="option" required>
-<label>Igisubizo C (si ngombwa)</label><input name="option">
-<label>Igisubizo D (si ngombwa)</label><input name="option">
-<label>Nomero y'igisubizo nyacyo (A=0, B=1, C=2, D=3)</label><input type="number" name="answer_index" min="0" max="3" required>
-<label>Impamvu / ibisobanuro</label><textarea name="explanation_rw" rows="2"></textarea>
-<label>Inkomoko yizewe (urugero RAB, MINAGRI, FAO)</label><input name="source_name" required placeholder="RAB — Rwanda Agriculture and Animal Resources Development Board">
-<label>URL y'inyandiko y'inkomoko</label><input type="url" name="source_url" required placeholder="https://...">
-<button class="btn" type="submit">Bika ikibazo kugira ngo gisuzumwe</button></form></section>
-<section class="card"><h2>🛡️ Amabwiriza yo kwemeza</h2><p>Ibibazo byemezwa gusa nyuma yo kugenzura ko:</p><ul><li>Inkomoko ari urwego rwizewe (RAB, MINAGRI, FAO, CGIAR cyangwa kaminuza).</li><li>Igisubizo gihuye n'inyandiko y'inkomoko.</li><li>Amakuru atarashaje kandi ajyanye n'ubuhinzi bwo mu Rwanda.</li><li>Inama y'imiti n'ifumbire itabangamira umutekano.</li></ul><p><b>Impamyabumenyi:</b> umunyeshuri utsinze nibura 67% ahabwa nimero yihariye n'urupapuro rushobora gucapwa no kugenzurwa.</p></section></div>
-<section class="card" style="margin-top:18px"><h2>📚 Ibibazo byashyizwe muri sisitemu</h2>{% for q in questions %}<div class="qrow"><b>{{ q.question_rw }}</b><p class="mut">{{ q.options|join(' · ') }}</p><small>Inkomoko: <a href="{{ q.source_url }}" target="_blank" rel="noopener">{{ q.source_name }}</a> · Byanditswe na {{ q.author or 'Admin' }}</small><p>{% if q.verified %}<span class="pill-ok">✓ Byemejwe — biri mu bizamini</span>{% else %}<span class="pill-wait">⏳ Birategereje isuzuma</span>{% endif %}</p><form method="post" action="/admin/learning/questions/{{ q.id }}/verify">{{ csrf_input() }}<button class="btn sm" type="submit">{{ 'Kuraho icyemezo' if q.verified else 'Emeza nyuma yo kugenzura' }}</button></form></div>{% else %}<p>Nta kibazo cya admin kirashyirwamo.</p>{% endfor %}</section></div>{% endblock %}
+
+<div class="admin-container">
+  
+  <!-- Banner Header -->
+  <header class="hero-banner">
+    <h1>🎓 Ikigo cy'ibizamini n'impamyabumenyi</h1>
+    <p>Admin yongeramo ibibazo bifite inkomoko y'amakuru. Ikibazo ntikigaragara mu kizamini kugeza gisuzumwe kandi cyemejwe.</p>
+  </header>
+
+  <div class="admin-grid">
+    
+    <!-- Left Column: Add Question Form -->
+    <section class="card">
+      <h2 class="card-title">➕ Ongeramo ikibazo</h2>
+      
+      <form method="post">
+        {{ csrf_input() }}
+
+        <div class="form-group">
+          <label for="course_id">Isomo</label>
+          <select id="course_id" name="course_id" class="form-control" required>
+            {% for c in courses %}
+              <option value="{{ c.id }}">{{ c.rw }} / {{ c.en }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="question_rw">Ikibazo mu Kinyarwanda</label>
+          <textarea id="question_rw" name="question_rw" class="form-control" rows="3" required minlength="10" placeholder="Andika ikibazo gisobanutse..."></textarea>
+        </div>
+
+        <div class="options-grid">
+          <div class="form-group">
+            <label for="opt_a">Igisubizo A</label>
+            <input id="opt_a" name="option" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="opt_b">Igisubizo B</label>
+            <input id="opt_b" name="option" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="opt_c">Igisubizo C <small style="color:var(--text-muted)">(Si ngombwa)</small></label>
+            <input id="opt_c" name="option" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="opt_d">Igisubizo D <small style="color:var(--text-muted)">(Si ngombwa)</small></label>
+            <input id="opt_d" name="option" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Hitamo igisubizo nyacyo</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="answer_index" value="0" required checked> A
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="answer_index" value="1"> B
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="answer_index" value="2"> C
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="answer_index" value="3"> D
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="explanation_rw">Impamvu / Ibisobanuro</label>
+          <textarea id="explanation_rw" name="explanation_rw" class="form-control" rows="2" placeholder="Tanga ibisobanuro magufi..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="source_name">Inkomoko yizewe</label>
+          <input id="source_name" name="source_name" class="form-control" required placeholder="RAB — Rwanda Agriculture and Animal Resources Development Board">
+        </div>
+
+        <div class="form-group">
+          <label for="source_url">URL y'inyandiko y'inkomoko</label>
+          <input id="source_url" type="url" name="source_url" class="form-control" required placeholder="https://example.gov.rw/document.pdf">
+        </div>
+
+        <button class="btn-submit" type="submit">Bika ikibazo kugira ngo gisuzumwe</button>
+      </form>
+    </section>
+
+    <!-- Right Column: Verification Guidelines -->
+    <section class="card">
+      <h2 class="card-title">🛡️ Amabwiriza yo kwemeza</h2>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">Ibibazo byemezwa gusa nyuma yo kugenzura ko:</p>
+      
+      <ul class="guidelines-list">
+        <li>Inkomoko ari urwego rwizewe (RAB, MINAGRI, FAO, CGIAR cyangwa kaminuza).</li>
+        <li>Igisubizo gihuye n'inyandiko y'inkomoko.</li>
+        <li>Amakuru atarashaje kandi ajyanye n'ubuhinzi bwo mu Rwanda.</li>
+        <li>Inama y'imiti n'ifumbire itabangamira umutekano.</li>
+      </ul>
+
+      <div class="cert-info">
+        <strong>Impamyabumenyi:</strong> Umunyeshuri utsinze nibura 67% ahabwa nimero yihariye n'urupapuro rushobora gucapwa no kugenzurwa.
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Bottom Section: Existing Questions List -->
+  <section class="card questions-section">
+    <h2 class="card-title">📚 Ibibazo byashyizwe muri sisitemu</h2>
+
+    {% for q in questions %}
+      <div class="question-item">
+        <div class="question-text">{{ loop.index }}. {{ q.question_rw }}</div>
+        
+        <div class="options-preview">
+          <strong>Ihitamo:</strong> {{ q.options|join(' · ') }}
+        </div>
+
+        <div class="meta-info">
+          Inkomoko: <a href="{{ q.source_url }}" target="_blank" rel="noopener">{{ q.source_name }}</a> 
+          • Byanditswe na <strong>{{ q.author or 'Admin' }}</strong>
+        </div>
+
+        <div>
+          {% if q.verified %}
+            <span class="badge badge-success">✓ Byemejwe — biri mu bizamini</span>
+          {% else %}
+            <span class="badge badge-warning">⏳ Birategereje isuzuma</span>
+          {% endif %}
+        </div>
+
+        <form method="post" action="/admin/learning/questions/{{ q.id }}/verify" style="margin-top: 4px;">
+          {{ csrf_input() }}
+          <button class="btn-action" type="submit">
+            {{ 'Kuraho icyemezo' if q.verified else 'Emeza nyuma yo kugenzura' }}
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <p style="color: var(--text-muted); text-align: center; margin: 20px 0;">Nta kibazo cya admin kirashyirwamo.</p>
+    {% endfor %}
+  </section>
+
+</div>
+{% endblock %}
