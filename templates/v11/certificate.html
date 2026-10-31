@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
 
-<!-- html2canvas for High-Res Image Export -->
+<!-- html2canvas for High-Res Image/PDF Export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -154,48 +154,19 @@
   .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 4px 4px; }
   .corner-br { bottom: -1px; right: -1px; border-width: 0 4px 4px 0; }
 
-  /* Header Branding & Logo */
+  /* Header Branding & System Logo */
   .cert-header-flex {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 15px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
-  .cert-logo-badge {
-    width: 55px;
-    height: 55px;
-    background: linear-gradient(135deg, var(--cert-green), var(--cert-green-light));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 26px;
-    box-shadow: 0 4px 10px rgba(7, 61, 41, 0.3);
-    border: 2px solid var(--cert-gold);
-  }
-
-  .cert-org-title {
-    text-align: left;
-  }
-
-  .cert-org-name {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 4px;
-    color: var(--cert-green);
-    text-transform: uppercase;
-  }
-
-  .cert-org-subname {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
-    color: #64748b;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+  .cert-system-logo {
+    max-height: 50px;
+    width: auto;
+    object-fit: contain;
   }
 
   .cert-title-main {
@@ -203,7 +174,7 @@
     font-size: 32px;
     font-weight: 800;
     color: var(--cert-gold-dark);
-    margin: 12px 0 2px 0;
+    margin: 10px 0 2px 0;
     text-transform: uppercase;
     letter-spacing: 2px;
   }
@@ -391,7 +362,7 @@
 
     <div class="btn-group">
       <button class="action-btn btn-print" onclick="window.print()">
-        🖨️ Capa / Save PDF
+        🖨️ Capa / Bika nka PDF
       </button>
 
       <button class="action-btn btn-download" onclick="downloadCertificateImage()">
@@ -425,13 +396,9 @@
         <div class="cert-corner corner-bl"></div>
         <div class="cert-corner corner-br"></div>
 
-        <!-- Header with Logo & Organization -->
+        <!-- Header with System Brand Logo -->
         <div class="cert-header-flex">
-          <div class="cert-logo-badge">🌾</div>
-          <div class="cert-org-title">
-            <div class="cert-org-name">KIZA-AGRI RWANDA</div>
-            <div class="cert-org-subname">Academy & Certification Center</div>
-          </div>
+          <img src="{{ url_for('static', filename='brand/kiza-logo-full.png') }}" alt="KIZA-AGRI Logo" class="cert-system-logo" onerror="this.onerror=null; this.src='/static/brand/kiza-logo-full.png';">
         </div>
 
         <div>
@@ -498,7 +465,7 @@
 
 <!-- JavaScript Utilities -->
 <script>
-  // High-Resolution Image Downloader using html2canvas
+  // High-Resolution Image/PDF Image Downloader using html2canvas
   function downloadCertificateImage() {
     const certElement = document.getElementById('certificateArea');
     
