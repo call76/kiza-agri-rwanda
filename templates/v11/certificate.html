@@ -1,3 +1,460 @@
-{% extends 'base.html' %}{% block title %}Impamyabumenyi · KIZA-AGRI{% endblock %}{% block body %}
-<style>@media print{nav,.no-print,footer{display:none!important}body{background:white!important}.cert-sheet{box-shadow:none!important;margin:0!important}}.cert-sheet{max-width:900px;margin:35px auto;padding:52px;border:12px double #bd9a36;background:linear-gradient(145deg,#fffef7,#f5f0dc);color:#203c2b;text-align:center;box-shadow:0 18px 50px #1232;border-radius:8px}.cert-sheet h1{font-family:Georgia,serif;font-size:42px;color:#956d16}.cert-sheet .name{font: bold 34px Georgia,serif;border-bottom:1px solid #b99a4e;display:inline-block;padding:8px 30px}.cert-no{letter-spacing:2px;font-weight:bold}</style>
-<div class="cert-sheet"><div style="font-size:54px">🌾 🏅 🌾</div><p style="letter-spacing:4px">KIZA-AGRI RWANDA · ACADEMY</p><h1>Certificate of Achievement</h1><h2>Impamyabumenyi y'amahugurwa</h2><p>Iyi mpamyabumenyi ihabwa</p><div class="name">{{ u.name }}</div><p>kubera kurangiza neza isomo rya</p><h2>{{ course.rw }}</h2><p>Yatsinze ikizamini ku manota ya <b>{{ cert.score }}%</b></p><p>Itariki: {{ cert.issued_at[:10] }}</p><p class="cert-no">Certificate No: {{ cert.certificate_no }}</p><p>Genzura iyi mpamyabumenyi kuri:<br><b>{{ request.url_root }}learning/verify/{{ cert.certificate_no }}</b></p><p style="margin-top:35px">KIZA-AGRI · Grow Smarter. Sell Better. Plan Together.</p></div><div class="no-print" style="text-align:center"><button class="btn" onclick="window.print()">🖨 Capa / Save as PDF</button></div>{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Impamyabumenyi · {{ u.name }} · KIZA-AGRI{% endblock %}
+
+{% block body %}
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+<!-- html2canvas library for downloading certificate as image -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+  :root {
+    --cert-gold: #c59b27;
+    --cert-gold-dark: #8a640f;
+    --cert-green: #073d29;
+    --cert-green-light: #16734b;
+    --cert-bg: #fffdf7;
+    --text-dark: #1c2826;
+  }
+
+  .cert-wrapper {
+    padding: 30px 15px;
+    background-color: #f3f4f6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Certificate Sheet Container */
+  .cert-sheet {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    background: var(--cert-bg);
+    color: var(--text-dark);
+    padding: 45px 55px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    margin: 0 auto 20px auto;
+    overflow: hidden;
+  }
+
+  .cert-border-outer {
+    border: 3px solid var(--cert-gold);
+    padding: 8px;
+    position: relative;
+  }
+
+  .cert-border-inner {
+    border: 1px solid var(--cert-gold-dark);
+    padding: 35px 40px;
+    position: relative;
+    text-align: center;
+    background: radial-gradient(circle, #ffffff 60%, #faf6e8 100%);
+  }
+
+  .cert-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: var(--cert-green);
+    border-style: solid;
+  }
+  .corner-tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; }
+  .corner-tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; }
+  .corner-bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; }
+  .corner-br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; }
+
+  .cert-header-org {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: var(--cert-green);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .cert-title-main {
+    font-family: 'Cinzel', serif;
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--cert-gold-dark);
+    margin: 10px 0 2px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .cert-title-sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cert-green-light);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .cert-present-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .cert-recipient-name {
+    font-family: 'Cinzel', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--cert-green);
+    border-bottom: 2px solid var(--cert-gold);
+    display: inline-block;
+    padding: 0 35px 4px 35px;
+    margin-bottom: 15px;
+  }
+
+  .cert-body-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #444;
+    max-width: 700px;
+    margin: 0 auto 15px auto;
+  }
+
+  .cert-course-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cert-gold-dark);
+    margin: 6px 0;
+  }
+
+  .cert-score-badge {
+    display: inline-block;
+    background: #f4efe0;
+    border: 1px solid var(--cert-gold);
+    color: var(--cert-green);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .cert-footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: flex-end;
+    margin-top: 25px;
+    padding-top: 10px;
+    text-align: center;
+  }
+
+  .cert-qr-box {
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    color: #666;
+  }
+
+  .cert-qr-box img {
+    width: 65px;
+    height: 65px;
+    border: 1px solid #ddd;
+    padding: 2px;
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: 3px;
+  }
+
+  .cert-seal {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto;
+    background: radial-gradient(circle, var(--cert-gold) 0%, var(--cert-gold-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border: 3px dashed #fffef7;
+  }
+
+  .cert-signature-box {
+    text-align: right;
+  }
+
+  .cert-signature-line {
+    font-family: 'Great Vibes', cursive;
+    font-size: 24px;
+    color: var(--cert-green);
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+    display: inline-block;
+    width: 160px;
+  }
+
+  .cert-signature-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #555;
+  }
+
+  .cert-meta-bar {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    color: #777;
+  }
+
+  /* Action Control Panel */
+  .control-panel {
+    width: 100%;
+    max-width: 960px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .action-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary-green {
+    background-color: var(--cert-green);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(7,61,41,0.2);
+  }
+  .btn-primary-green:hover {
+    background-color: var(--cert-green-light);
+  }
+
+  .btn-secondary-gold {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+  }
+  .btn-secondary-gold:hover {
+    background-color: #fde68a;
+  }
+
+  .btn-share-wa {
+    background-color: #25d366;
+    color: #ffffff;
+  }
+  .btn-share-wa:hover {
+    background-color: #1ebe5d;
+  }
+
+  .copy-notice {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #059669;
+    display: none;
+    font-weight: 600;
+  }
+
+  @media print {
+    @page {
+      size: landscape;
+      margin: 0;
+    }
+    body, .cert-wrapper {
+      background: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    nav, footer, .no-print, .control-panel, .header {
+      display: none !important;
+    }
+    .cert-sheet {
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      padding: 25px !important;
+      margin: 0 !important;
+    }
+  }
+</style>
+
+<div class="cert-wrapper">
+
+  <!-- Interactive Action & Features Control Panel -->
+  <div class="no-print control-panel">
+    <div>
+      <h3 style="margin:0 0 4px 0; font-family:'Montserrat', sans-serif; font-size:16px; color:var(--cert-green);">⚙️ Ibyo ushobora gukora ku mpamyabumenyi</h3>
+      <p style="margin:0; font-family:'Montserrat', sans-serif; font-size:12px; color:#6b7280;">Hitamo uburyo bwo gusatura, gukurura (download) cyangwa gusangiza abandi.</p>
+    </div>
+
+    <div class="btn-group">
+      <!-- Print / Save PDF -->
+      <button class="action-btn btn-primary-green" onclick="window.print()">
+        🖨️ Capa / Save PDF
+      </button>
+
+      <!-- Download as Image -->
+      <button class="action-btn btn-secondary-gold" onclick="downloadCertificateImage()">
+        📥 Downloada nka PNG
+      </button>
+
+      <!-- Copy Verification Link -->
+      <button class="action-btn" style="background:#f3f4f6; color:#374151; border:1px solid #d1d5db;" onclick="copyCertLink()">
+        🔗 Koporora Link
+      </button>
+
+      <!-- Share WhatsApp -->
+      <a class="action-btn btn-share-wa" href="https://api.whatsapp.com/send?text=Narangije%20isomo%20rya%20{{ course.rw }}%20kuri%20KIZA-AGRI%20nshINGA%20ku%20manota%20ya%20{{ cert.score }}%!%20Genzura%20hano:%20{{ request.url_root }}learning/verify/{{ cert.certificate_no }}" target="_blank" rel="noopener">
+        💬 Sangiza WhatsApp
+      </a>
+    </div>
+    
+    <div id="copyNotice" class="copy-notice">✓ Link yakoporowe neza mu mwanya wawe!</div>
+  </div>
+
+  <!-- Certificate Printable Sheet -->
+  <div class="cert-sheet" id="certificateArea">
+    <div class="cert-border-outer">
+      <div class="cert-border-inner">
+        
+        <!-- Corner Decorations -->
+        <div class="cert-corner corner-tl"></div>
+        <div class="cert-corner corner-tr"></div>
+        <div class="cert-corner corner-bl"></div>
+        <div class="cert-corner corner-br"></div>
+
+        <!-- Header -->
+        <div>
+          <div style="font-size: 28px; margin-bottom: 3px;">🌾 🏅 🌾</div>
+          <div class="cert-header-org">KIZA-AGRI RWANDA ACADEMY</div>
+          <h1 class="cert-title-main">Certificate of Achievement</h1>
+          <div class="cert-title-sub">Impamyabumenyi y'Amahugurwa mu Bya Kijyambere mu Buhinzi</div>
+        </div>
+
+        <!-- Recipient -->
+        <div>
+          <div class="cert-present-text">Iyi mpamyabumenyi ihabwa / This is awarded to</div>
+          <div class="cert-recipient-name">{{ u.name }}</div>
+          
+          <div class="cert-body-text">
+            kubera kurangiza neza kandi mu buryo bw'indashyikirwa isomo rya:
+            <div class="cert-course-title">{{ course.rw }}</div>
+          </div>
+
+          <div class="cert-score-badge">
+            ✓ Yatsinze ikizamini ku manota: <strong>{{ cert.score }}%</strong>
+          </div>
+        </div>
+
+        <!-- Footer Grid -->
+        <div class="cert-footer-grid">
+          
+          <!-- QR Verification Code -->
+          <div class="cert-qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.url_root }}learning/verify/{{ cert.certificate_no }}" alt="QR Code">
+            <div><strong>Genzura Umwimerere:</strong></div>
+            <div style="font-size: 9px; word-break: break-all;">No: {{ cert.certificate_no }}</div>
+          </div>
+
+          <!-- Official Stamp Seal -->
+          <div>
+            <div class="cert-seal">
+              KIZA-AGRI<br>OFFICIAL<br>SEAL
+            </div>
+          </div>
+
+          <!-- Signature -->
+          <div class="cert-signature-box">
+            <div class="cert-signature-line">KIZA Admin</div>
+            <div class="cert-signature-title">Umuyobozi wa KIZA-AGRI</div>
+          </div>
+
+        </div>
+
+        <!-- Bottom Metadata -->
+        <div class="cert-meta-bar">
+          <span><strong>Itariki:</strong> {{ cert.issued_at[:10] }}</span>
+          <span><em>Grow Smarter. Sell Better. Plan Together.</em></span>
+          <span><strong>Verif:</strong> {{ cert.certificate_no }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- JavaScript Utilities -->
+<script>
+  // Function to download the certificate as a PNG Image
+  function downloadCertificateImage() {
+    const certElement = document.getElementById('certificateArea');
+    
+    // Temporarily adjust scale for crisp image output
+    html2canvas(certElement, { scale: 2, useCORS: true }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'KIZA-AGRI-Certificate-{{ cert.certificate_no }}.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  }
+
+  // Function to copy certificate URL verification link
+  function copyCertLink() {
+    const verifyUrl = "{{ request.url_root }}learning/verify/{{ cert.certificate_no }}";
+    navigator.clipboard.writeText(verifyUrl).then(() => {
+      const notice = document.getElementById('copyNotice');
+      notice.style.display = 'block';
+      setTimeout(() => {
+        notice.style.display = 'none';
+      }, 3500);
+    });
+  }
+</script>
+{% endblock %}
