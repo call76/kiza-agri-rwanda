@@ -3,12 +3,12 @@
 {% block title %}Impamyabumenyi · {{ u.name }} · KIZA-AGRI{% endblock %}
 
 {% block body %}
-<!-- Google Fonts -->
+<!-- Google Fonts for Luxury Typography -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
 
-<!-- html2canvas library for downloading certificate as image -->
+<!-- html2canvas for High-Res Image Export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -23,25 +23,106 @@
 
   .cert-wrapper {
     padding: 30px 15px;
-    background-color: #f3f4f6;
+    background-color: #eef2f3;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  /* Certificate Sheet Container */
+  /* Control Panel for Advanced Actions */
+  .no-print.control-panel {
+    width: 100%;
+    max-width: 980px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+  }
+
+  .control-title h3 {
+    margin: 0 0 4px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cert-green);
+  }
+
+  .control-title p {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .action-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn-print { background-color: var(--cert-green); color: #fff; }
+  .btn-print:hover { background-color: var(--cert-green-light); transform: translateY(-1px); }
+
+  .btn-download { background-color: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .btn-download:hover { background-color: #fde68a; }
+
+  .btn-copy { background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+  .btn-copy:hover { background-color: #e2e8f0; }
+
+  .btn-wa { background-color: #25d366; color: #fff; }
+  .btn-wa:hover { background-color: #1ebe5d; }
+
+  .btn-linkedin { background-color: #0a66c2; color: #fff; }
+  .btn-linkedin:hover { background-color: #084e96; }
+
+  .copy-toast {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #059669;
+    font-weight: 600;
+    display: none;
+    background: #ecfdf5;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #a7f3d0;
+  }
+
+  /* Certificate Sheet Container (A4 Landscape Proportions) */
   .cert-sheet {
     position: relative;
     width: 100%;
-    max-width: 960px;
+    max-width: 980px;
     background: var(--cert-bg);
     color: var(--text-dark);
-    padding: 45px 55px;
+    padding: 40px 50px;
     box-sizing: border-box;
-    border-radius: 4px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-    margin: 0 auto 20px auto;
+    border-radius: 6px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    margin: 0 auto;
     overflow: hidden;
   }
 
@@ -49,64 +130,101 @@
     border: 3px solid var(--cert-gold);
     padding: 8px;
     position: relative;
+    background: #fff;
   }
 
   .cert-border-inner {
     border: 1px solid var(--cert-gold-dark);
-    padding: 35px 40px;
+    padding: 30px 45px;
     position: relative;
     text-align: center;
-    background: radial-gradient(circle, #ffffff 60%, #faf6e8 100%);
+    background: radial-gradient(circle, #ffffff 50%, #fdfbf5 100%);
   }
 
+  /* Ornate Corner Accents */
   .cert-corner {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     border-color: var(--cert-green);
     border-style: solid;
   }
-  .corner-tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; }
-  .corner-tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; }
-  .corner-bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; }
-  .corner-br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; }
+  .corner-tl { top: -1px; left: -1px; border-width: 4px 0 0 4px; }
+  .corner-tr { top: -1px; right: -1px; border-width: 4px 4px 0 0; }
+  .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 4px 4px; }
+  .corner-br { bottom: -1px; right: -1px; border-width: 0 4px 4px 0; }
 
-  .cert-header-org {
+  /* Header Branding & Logo */
+  .cert-header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 8px;
+  }
+
+  .cert-logo-badge {
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, var(--cert-green), var(--cert-green-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 26px;
+    box-shadow: 0 4px 10px rgba(7, 61, 41, 0.3);
+    border: 2px solid var(--cert-gold);
+  }
+
+  .cert-org-title {
+    text-align: left;
+  }
+
+  .cert-org-name {
     font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 5px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 4px;
     color: var(--cert-green);
     text-transform: uppercase;
-    margin-bottom: 5px;
+  }
+
+  .cert-org-subname {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
   .cert-title-main {
     font-family: 'Cinzel', serif;
-    font-size: 34px;
+    font-size: 32px;
     font-weight: 800;
     color: var(--cert-gold-dark);
-    margin: 10px 0 2px 0;
+    margin: 12px 0 2px 0;
     text-transform: uppercase;
     letter-spacing: 2px;
   }
 
   .cert-title-sub {
     font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--cert-green-light);
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     font-style: italic;
   }
 
+  /* Recipient Details */
   .cert-present-text {
     font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
-    color: #666;
+    font-size: 11px;
+    color: #555;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .cert-recipient-name {
@@ -116,17 +234,17 @@
     color: var(--cert-green);
     border-bottom: 2px solid var(--cert-gold);
     display: inline-block;
-    padding: 0 35px 4px 35px;
-    margin-bottom: 15px;
+    padding: 0 35px 3px 35px;
+    margin-bottom: 14px;
   }
 
   .cert-body-text {
     font-family: 'Montserrat', sans-serif;
     font-size: 13px;
     line-height: 1.5;
-    color: #444;
-    max-width: 700px;
-    margin: 0 auto 15px auto;
+    color: #334155;
+    max-width: 680px;
+    margin: 0 auto 12px auto;
   }
 
   .cert-course-title {
@@ -139,7 +257,7 @@
 
   .cert-score-badge {
     display: inline-block;
-    background: #f4efe0;
+    background: #fef9e7;
     border: 1px solid var(--cert-gold);
     color: var(--cert-green);
     padding: 5px 14px;
@@ -149,6 +267,7 @@
     font-weight: 600;
   }
 
+  /* Footer Layout Grid (QR Code, Gold Seal, Digital Signature) */
   .cert-footer-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -162,143 +281,80 @@
     text-align: left;
     font-family: 'Montserrat', sans-serif;
     font-size: 10px;
-    color: #666;
+    color: #64748b;
   }
 
   .cert-qr-box img {
-    width: 65px;
-    height: 65px;
-    border: 1px solid #ddd;
+    width: 60px;
+    height: 60px;
+    border: 1px solid #cbd5e1;
     padding: 2px;
     background: #fff;
     border-radius: 4px;
     margin-bottom: 3px;
   }
 
+  /* Gold Embossed Seal */
   .cert-seal {
     width: 75px;
     height: 75px;
     margin: 0 auto;
-    background: radial-gradient(circle, var(--cert-gold) 0%, var(--cert-gold-dark) 100%);
+    background: radial-gradient(circle, #fde047 0%, var(--cert-gold-dark) 100%);
     border-radius: 50%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     color: #fff;
     font-family: 'Cinzel', serif;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: bold;
     text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     border: 3px dashed #fffef7;
   }
 
+  /* Signature Styling */
   .cert-signature-box {
     text-align: right;
   }
 
+  .cert-signature-img {
+    font-family: 'Alex Brush', cursive;
+    font-size: 32px;
+    color: #0f172a;
+    line-height: 1;
+    margin-bottom: -5px;
+  }
+
   .cert-signature-line {
-    font-family: 'Great Vibes', cursive;
-    font-size: 24px;
-    color: var(--cert-green);
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #94a3b8;
     padding-bottom: 2px;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
     display: inline-block;
-    width: 160px;
+    width: 170px;
   }
 
   .cert-signature-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 10px;
     font-weight: 600;
-    color: #555;
+    color: #475569;
   }
 
+  /* Meta Bar */
   .cert-meta-bar {
-    margin-top: 20px;
-    padding-top: 12px;
-    border-top: 1px solid #eee;
+    margin-top: 18px;
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
     display: flex;
     justify-content: space-between;
     font-family: 'Montserrat', sans-serif;
     font-size: 10px;
-    color: #777;
+    color: #64748b;
   }
 
-  /* Action Control Panel */
-  .control-panel {
-    width: 100%;
-    max-width: 960px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    margin-bottom: 30px;
-  }
-
-  .btn-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .action-btn {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 10px 18px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
-    text-decoration: none;
-  }
-
-  .btn-primary-green {
-    background-color: var(--cert-green);
-    color: #ffffff;
-    box-shadow: 0 2px 6px rgba(7,61,41,0.2);
-  }
-  .btn-primary-green:hover {
-    background-color: var(--cert-green-light);
-  }
-
-  .btn-secondary-gold {
-    background-color: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
-  }
-  .btn-secondary-gold:hover {
-    background-color: #fde68a;
-  }
-
-  .btn-share-wa {
-    background-color: #25d366;
-    color: #ffffff;
-  }
-  .btn-share-wa:hover {
-    background-color: #1ebe5d;
-  }
-
-  .copy-notice {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
-    color: #059669;
-    display: none;
-    font-weight: 600;
-  }
-
+  /* PRINT OPTIMIZATION (A4 Landscape) */
   @media print {
     @page {
       size: landscape;
@@ -318,7 +374,7 @@
       width: 100vw !important;
       height: 100vh !important;
       max-width: none !important;
-      padding: 25px !important;
+      padding: 20px !important;
       margin: 0 !important;
     }
   }
@@ -326,36 +382,36 @@
 
 <div class="cert-wrapper">
 
-  <!-- Interactive Action & Features Control Panel -->
+  <!-- Advanced Interactive Control Panel -->
   <div class="no-print control-panel">
-    <div>
-      <h3 style="margin:0 0 4px 0; font-family:'Montserrat', sans-serif; font-size:16px; color:var(--cert-green);">⚙️ Ibyo ushobora gukora ku mpamyabumenyi</h3>
-      <p style="margin:0; font-family:'Montserrat', sans-serif; font-size:12px; color:#6b7280;">Hitamo uburyo bwo gusatura, gukurura (download) cyangwa gusangiza abandi.</p>
+    <div class="control-title">
+      <h3>🎓 KIZA-AGRI Certificate Studio</h3>
+      <p>Koresha izi buto kugira ngo ubike, ucape cyangwa usangize impamyabumenyi yawe.</p>
     </div>
 
     <div class="btn-group">
-      <!-- Print / Save PDF -->
-      <button class="action-btn btn-primary-green" onclick="window.print()">
+      <button class="action-btn btn-print" onclick="window.print()">
         🖨️ Capa / Save PDF
       </button>
 
-      <!-- Download as Image -->
-      <button class="action-btn btn-secondary-gold" onclick="downloadCertificateImage()">
+      <button class="action-btn btn-download" onclick="downloadCertificateImage()">
         📥 Downloada nka PNG
       </button>
 
-      <!-- Copy Verification Link -->
-      <button class="action-btn" style="background:#f3f4f6; color:#374151; border:1px solid #d1d5db;" onclick="copyCertLink()">
+      <button class="action-btn btn-copy" onclick="copyCertLink()">
         🔗 Koporora Link
       </button>
 
-      <!-- Share WhatsApp -->
-      <a class="action-btn btn-share-wa" href="https://api.whatsapp.com/send?text=Narangije%20isomo%20rya%20{{ course.rw }}%20kuri%20KIZA-AGRI%20nshINGA%20ku%20manota%20ya%20{{ cert.score }}%!%20Genzura%20hano:%20{{ request.url_root }}learning/verify/{{ cert.certificate_no }}" target="_blank" rel="noopener">
-        💬 Sangiza WhatsApp
+      <a class="action-btn btn-wa" href="https://api.whatsapp.com/send?text=Narangije%20neza%20isomo%20rya%20{{ course.rw }}%20kuri%20KIZA-AGRI%20nshINGA%20ku%20manota%20ya%20{{ cert.score }}%!%20Genzura%20hano:%20{{ request.url_root }}learning/verify/{{ cert.certificate_no }}" target="_blank" rel="noopener">
+        💬 WhatsApp
+      </a>
+
+      <a class="action-btn btn-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url_root }}learning/verify/{{ cert.certificate_no }}" target="_blank" rel="noopener">
+        💼 LinkedIn
       </a>
     </div>
-    
-    <div id="copyNotice" class="copy-notice">✓ Link yakoporowe neza mu mwanya wawe!</div>
+
+    <div id="copyToast" class="copy-toast">✓ Link yakoporowe neza!</div>
   </div>
 
   <!-- Certificate Printable Sheet -->
@@ -363,65 +419,75 @@
     <div class="cert-border-outer">
       <div class="cert-border-inner">
         
-        <!-- Corner Decorations -->
+        <!-- Ornate Corners -->
         <div class="cert-corner corner-tl"></div>
         <div class="cert-corner corner-tr"></div>
         <div class="cert-corner corner-bl"></div>
         <div class="cert-corner corner-br"></div>
 
-        <!-- Header -->
+        <!-- Header with Logo & Organization -->
+        <div class="cert-header-flex">
+          <div class="cert-logo-badge">🌾</div>
+          <div class="cert-org-title">
+            <div class="cert-org-name">KIZA-AGRI RWANDA</div>
+            <div class="cert-org-subname">Academy & Certification Center</div>
+          </div>
+        </div>
+
         <div>
-          <div style="font-size: 28px; margin-bottom: 3px;">🌾 🏅 🌾</div>
-          <div class="cert-header-org">KIZA-AGRI RWANDA ACADEMY</div>
           <h1 class="cert-title-main">Certificate of Achievement</h1>
           <div class="cert-title-sub">Impamyabumenyi y'Amahugurwa mu Bya Kijyambere mu Buhinzi</div>
         </div>
 
-        <!-- Recipient -->
+        <!-- Recipient Information -->
         <div>
-          <div class="cert-present-text">Iyi mpamyabumenyi ihabwa / This is awarded to</div>
+          <div class="cert-present-text">Iyi mpamyabumenyi ihabwa / This is proudly presented to</div>
           <div class="cert-recipient-name">{{ u.name }}</div>
           
           <div class="cert-body-text">
-            kubera kurangiza neza kandi mu buryo bw'indashyikirwa isomo rya:
+            kubera kurangiza neza amasomo no gutsinda isuzuma ry'ubumenyi mu isomo rya:
             <div class="cert-course-title">{{ course.rw }}</div>
           </div>
 
           <div class="cert-score-badge">
-            ✓ Yatsinze ikizamini ku manota: <strong>{{ cert.score }}%</strong>
+            ✓ Umwanya n'Amanota: <strong>{{ cert.score }}%</strong> (Yatsinze neza cyane)
           </div>
         </div>
 
-        <!-- Footer Grid -->
+        <!-- Footer Grid: QR Code, Gold Seal, Signature -->
         <div class="cert-footer-grid">
           
-          <!-- QR Verification Code -->
+          <!-- QR Code Verification -->
           <div class="cert-qr-box">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.url_root }}learning/verify/{{ cert.certificate_no }}" alt="QR Code">
-            <div><strong>Genzura Umwimerere:</strong></div>
-            <div style="font-size: 9px; word-break: break-all;">No: {{ cert.certificate_no }}</div>
+            <div><strong>Scan to Verify:</strong></div>
+            <div style="font-size: 8px; word-break: break-all;">No: {{ cert.certificate_no }}</div>
           </div>
 
-          <!-- Official Stamp Seal -->
+          <!-- Gold Embossed Seal -->
           <div>
             <div class="cert-seal">
-              KIZA-AGRI<br>OFFICIAL<br>SEAL
+              <span>★</span>
+              <span>KIZA-AGRI</span>
+              <span>VERIFIED</span>
             </div>
           </div>
 
-          <!-- Signature -->
+          <!-- Digital Signature Section -->
           <div class="cert-signature-box">
-            <div class="cert-signature-line">KIZA Admin</div>
-            <div class="cert-signature-title">Umuyobozi wa KIZA-AGRI</div>
+            <div class="cert-signature-line">
+              <div class="cert-signature-img">Jean Bosco K.</div>
+            </div>
+            <div class="cert-signature-title">Umuyobozi Mukuru (CEO, KIZA-AGRI)</div>
           </div>
 
         </div>
 
-        <!-- Bottom Metadata -->
+        <!-- Bottom Metadata Bar -->
         <div class="cert-meta-bar">
           <span><strong>Itariki:</strong> {{ cert.issued_at[:10] }}</span>
           <span><em>Grow Smarter. Sell Better. Plan Together.</em></span>
-          <span><strong>Verif:</strong> {{ cert.certificate_no }}</span>
+          <span><strong>ID:</strong> {{ cert.certificate_no }}</span>
         </div>
 
       </div>
@@ -432,12 +498,11 @@
 
 <!-- JavaScript Utilities -->
 <script>
-  // Function to download the certificate as a PNG Image
+  // High-Resolution Image Downloader using html2canvas
   function downloadCertificateImage() {
     const certElement = document.getElementById('certificateArea');
     
-    // Temporarily adjust scale for crisp image output
-    html2canvas(certElement, { scale: 2, useCORS: true }).then(canvas => {
+    html2canvas(certElement, { scale: 2.5, useCORS: true }).then(canvas => {
       const link = document.createElement('a');
       link.download = 'KIZA-AGRI-Certificate-{{ cert.certificate_no }}.png';
       link.href = canvas.toDataURL('image/png');
@@ -445,14 +510,14 @@
     });
   }
 
-  // Function to copy certificate URL verification link
+  // Copy Verification Link with Toast Notice
   function copyCertLink() {
     const verifyUrl = "{{ request.url_root }}learning/verify/{{ cert.certificate_no }}";
     navigator.clipboard.writeText(verifyUrl).then(() => {
-      const notice = document.getElementById('copyNotice');
-      notice.style.display = 'block';
+      const toast = document.getElementById('copyToast');
+      toast.style.display = 'inline-block';
       setTimeout(() => {
-        notice.style.display = 'none';
+        toast.style.display = 'none';
       }, 3500);
     });
   }
