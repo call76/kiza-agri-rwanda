@@ -1,13 +1,441 @@
-{% extends 'base.html' %}{% block title %}{{ L('Learning Center','Ishuri ry\'abahinzi','Centre de formation') }} · KIZA-AGRI{% endblock %}{% block body %}
-<div class="v11-h"><h1>🎓 {{ L('Farmer Learning Center','Ishuri ry\'abahinzi','Centre de formation') }}</h1><p>{{ L('Short lessons in Kinyarwanda, video and a quiz. Score ' ~ pass_mark ~ '% to earn your certificate.','Amasomo mu Kinyarwanda, videwo n\'ikizamini. Tsinda ku manota ' ~ pass_mark ~ '% ubone impamyabumenyi.','Cours, vidéo et quiz. ' ~ pass_mark ~ '% pour le certificat.') }}</p></div>
-{% for c in courses %}{% set p = prog.get(c.id) %}
-<div class="card" id="{{ c.id }}" style="margin:14px 0;padding:18px">
- <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h2 style="margin:0">{{ c.rw if lang=='rw' else c.en }}</h2>
-  <span>{% if p %}<b class="badge">{{ p.score }}%{{ ' ✔' if p.passed }}</b> {% endif %}<button class="btn sm" type="button" onclick="var d=document.getElementById('b-{{ c.id }}');d.hidden=!d.hidden">▶ {{ L('Start lesson','Tangira isomo','Commencer') }}</button></span></div>
- <div id="b-{{ c.id }}" {{ 'hidden' if not (request.args.get('o')==c.id) }} style="margin-top:14px;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-  <div><div style="aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#0003"><iframe src="{{ c.video }}" title="{{ c.en }}" loading="lazy" allowfullscreen style="width:100%;height:100%;border:0"></iframe></div><p style="line-height:1.6">{{ c.body }}</p></div>
-  <form method="post" action="/learning/{{ c.id }}/submit">{{ csrf_input() }}<h3>{{ L('Quiz','Ikizamini','Quiz') }}</h3>
-  {% for q,opts,a in c.quiz %}{% set i = loop.index0 %}<p><b>{{ loop.index }}. {{ q }}</b></p>{% for o in opts %}<label style="display:block;padding:6px 0"><input type="radio" name="q{{ i }}" value="{{ loop.index0 }}" required> {{ o }}</label>{% endfor %}{% endfor %}
-  <button class="btn">{{ L('Submit answers','Ohereza ibisubizo','Envoyer') }}</button></form></div>
- {% if p and p.passed and certs.get(c.id) %}<div class="cert" style="margin-top:16px;padding:22px;text-align:center;border:2px solid #d4af37;border-radius:18px;background:linear-gradient(135deg,#fffdf3,#f4edcf);color:#25351f"><div style="font-size:38px">🏅</div><small style="letter-spacing:.2em;text-transform:uppercase">{{ L('Verified course certificate','Impamyabumenyi y’isomo','Certificat de formation') }}</small><h2 style="margin:6px 0">{{ c.rw if lang=='rw' else c.en }}</h2><p>{{ u.name }} · {{ certs[c.id].score }}% · {{ certs[c.id].issued_at[:10] }}</p><a class="btn sm" href="/learning/certificate/{{ certs[c.id].id }}">📜 {{ L('Open certificate','Fungura impamyabumenyi','Ouvrir le certificat') }}</a></div>{% endif %}
-</div>{% endfor %}{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}{{ L('Learning Center','Ishuri ry\'abahinzi','Centre de formation') }} · KIZA-AGRI{% endblock %}
+
+{% block body %}
+<!-- Styles -->
+<style>
+  :root {
+    --primary: #075e3a;
+    --primary-dark: #04442a;
+    --primary-light: #e8f5e9;
+    --accent: #d4af37;
+    --bg-gray: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+  }
+
+  .learning-hero {
+    background: linear-gradient(135deg, #073d29 0%, #16734b 100%);
+    color: white;
+    padding: 32px 24px;
+    border-radius: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px rgba(7, 61, 41, 0.15);
+  }
+
+  .learning-hero h1 {
+    font-size: 1.8rem;
+    margin: 0 0 8px 0;
+    font-weight: 800;
+  }
+
+  .learning-hero p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+    max-width: 750px;
+    line-height: 1.5;
+  }
+
+  /* Course Card Container */
+  .course-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .course-card-header {
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #ffffff;
+    border-bottom: 1px solid transparent;
+  }
+
+  .course-card-header.active {
+    border-bottom-color: var(--border-color);
+    background: #f8fafc;
+  }
+
+  .course-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+  }
+
+  .course-status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .badge-passed { background: #dcfce7; color: #15803d; }
+  .badge-progress { background: #fef3c7; color: #b45309; }
+
+  /* Expanded Course Workspace */
+  .course-body {
+    padding: 24px;
+    display: none; /* Controlled by JS */
+  }
+
+  .course-body.show {
+    display: block;
+  }
+
+  /* Navigation Tabs inside course */
+  .course-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 10px 18px;
+    border: none;
+    background: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+
+  .tab-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Lessons Steps Flow */
+  .lesson-step-content {
+    display: none;
+  }
+
+  .lesson-step-content.active {
+    display: block;
+  }
+
+  .video-container {
+    aspect-ratio: 16/9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .lesson-text-body {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #334155;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+  }
+
+  /* Controls/Buttons */
+  .step-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .btn-kiza {
+    background-color: var(--primary);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-kiza:hover {
+    background-color: var(--primary-dark);
+  }
+
+  .btn-outline {
+    background: #ffffff;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-outline:hover { background: #f1f5f9; }
+
+  /* Quiz Section */
+  .quiz-box {
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    padding: 24px;
+    border-radius: 14px;
+  }
+
+  .quiz-question {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #fef3c7;
+    margin-bottom: 16px;
+  }
+
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 0.92rem;
+  }
+
+  .quiz-option:hover {
+    background: #fef9c3;
+  }
+
+  .quiz-locked-notice {
+    text-align: center;
+    padding: 30px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Certificate Banner */
+  .cert-banner {
+    margin-top: 20px;
+    padding: 24px;
+    text-align: center;
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fffdf3 0%, #f4edcf 100%);
+    color: #25351f;
+  }
+</style>
+
+<!-- Hero Section -->
+<div class="learning-hero">
+  <h1>🎓 {{ L('Farmer Learning Center','Ishuri ry\'abahinzi mu Kinyarwanda','Centre de formation agricole') }}</h1>
+  <p>{{ L('Soma amasomo, reba videwo uyaminze hanyuma ukore ikizamini. Tsinda ku manota ' ~ pass_mark ~ '% uone impamyabumenyi y\'agaciro!','Soma amasomo yose n\'isuzuma, uyaminze uze gukora ikizamini. Tsinda ku manota ' ~ pass_mark ~ '% ubone impamyabumenyi.','Apprenez par étapes, regardez les vidéos et faites le test. Obtenez ' ~ pass_mark ~ '% pour le certificat.') }}</p>
+</div>
+
+<!-- Courses List Loop -->
+{% for c in courses %}
+  {% set p = prog.get(c.id) %}
+  
+  <div class="course-card" id="course-card-{{ c.id }}">
+    
+    <!-- Header Summary Bar -->
+    <div class="course-card-header" id="header-{{ c.id }}">
+      <div>
+        <h2 class="course-title">{{ c.rw if lang=='rw' else c.en }}</h2>
+        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+          📖 {{ L('Amasomo 2 & Video 1','Amasomo 2 & Video 1','2 Leçons & 1 Vidéo') }}
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px;">
+        {% if p %}
+          {% if p.passed %}
+            <span class="course-status-badge badge-passed">✓ {{ p.score }}% {{ L('Byarangiye','Yatsinze','Réussi') }}</span>
+          {% else %}
+            <span class="course-status-badge badge-progress">⏳ {{ p.score }}% {{ L('Rongera ugeze','Muri gukora','En cours') }}</span>
+          {% endif %}
+        {% endif %}
+
+        <button class="btn-kiza" type="button" onclick="toggleCourseWorkspace('{{ c.id }}')">
+          ▶ {{ L('Tangira Isomo','Tangira Isomo','Commencer') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Course Detailed Workspace (Hidden by default) -->
+    <div class="course-body" id="workspace-{{ c.id }}">
+      
+      <!-- Internal Navigation Tabs -->
+      <div class="course-tabs">
+        <button class="tab-btn active" id="tab-btn-lesson-{{ c.id }}" onclick="switchCourseTab('{{ c.id }}', 'lesson')">
+          📖 1. {{ L('Amasomo n\'Inyandiko','Amasomo n\'Inyandiko','Leçon & Notes') }}
+        </button>
+        
+        <button class="tab-btn" id="tab-btn-video-{{ c.id }}" onclick="switchCourseTab('{{ c.id }}', 'video')">
+          📹 2. {{ L('Videwo y\'Amahugurwa','Videwo y\'Amahugurwa','Vidéo d\'apprentissage') }}
+        </button>
+        
+        <button class="tab-btn" id="tab-btn-quiz-{{ c.id }}" onclick="switchCourseTab('{{ c.id }}', 'quiz')">
+          📝 3. {{ L('Ikizamini Nyirizina','Ikizamini Nyirizina','Quiz d\'évaluation') }}
+        </button>
+      </div>
+
+      <!-- TAB 1: TEXT LESSON CONTENT -->
+      <div class="lesson-step-content active" id="step-lesson-{{ c.id }}">
+        <h3>📚 {{ L('Inyandiko z\'Ibyiga','Inyandiko z\'Isomo','Contenu de la leçon') }}</h3>
+        <div class="lesson-text-body">
+          {{ c.body | safe }}
+        </div>
+
+        <div class="step-controls">
+          <span style="color:var(--text-muted); font-size:0.85rem;">Step 1 / 3</span>
+          <button class="btn-kiza" onclick="switchCourseTab('{{ c.id }}', 'video')">
+            {{ L('Komeza kuri Videwo','Komeza kuri Videwo','Continuer vers la vidéo') }} ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: VIDEO LESSON CONTENT -->
+      <div class="lesson-step-content" id="step-video-{{ c.id }}">
+        <h3>📹 {{ L('Reba videwo ukurikira neza','Reba Videwo y\'Isomo','Regarder la vidéo') }}</h3>
+        
+        <div class="video-container">
+          <iframe src="{{ c.video }}" title="{{ c.en }}" loading="lazy" allowfullscreen style="width:100%;height:100%;border:0;"></iframe>
+        </div>
+
+        <div class="step-controls">
+          <button class="btn-outline" onclick="switchCourseTab('{{ c.id }}', 'lesson')">
+            ⬅ {{ L('Subira inyuma','Subira ku nyandiko','Précédent') }}
+          </button>
+          
+          <button class="btn-kiza" onclick="unlockQuizAndGo('{{ c.id }}')">
+            {{ L('Narangije gusoma, Jya ku Kizamini','Narangije gusoma, Jya ku Kizamini','Passer au Quiz') }} 🎓
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: QUIZ & ASSESSMENT -->
+      <div class="lesson-step-content" id="step-quiz-{{ c.id }}">
+        
+        <div class="quiz-box">
+          <h3 style="margin-top:0; color:#854d0e;">📝 {{ L('Ikizamini cyo ku Isomo','Ikizamini cy\'isomo','Quiz d\'évaluation') }}</h3>
+          <p style="font-size:0.9rem; color:#713f12; margin-bottom:20px;">
+            {{ L('Soma buri kibazo neza, uhitamo igisubizo nyakuri. Ugomba kubona ' ~ pass_mark ~ '% kugira ngo uzabe wemerewe Impamyabumenyi.','Hitsamo neza ibisubizo by\'ibibazo. Baza ubona ' ~ pass_mark ~ '% uze kumpamyabumenyi.','Répondez correctement. Score minimum: ' ~ pass_mark ~ '%.') }}
+          </p>
+
+          <form method="post" action="/learning/{{ c.id }}/submit">
+            {{ csrf_input() }}
+
+            {% for q, opts, a in c.quiz %}
+              {% set i = loop.index0 %}
+              <div class="quiz-question">
+                <p style="margin:0 0 12px 0; font-weight:700;">{{ loop.index }}. {{ q }}</p>
+                {% for o in opts %}
+                  <label class="quiz-option">
+                    <input type="radio" name="q{{ i }}" value="{{ loop.index0 }}" required>
+                    <span>{{ o }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            {% endfor %}
+
+            <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
+              <button class="btn-outline" type="button" onclick="switchCourseTab('{{ c.id }}', 'video')">
+                ⬅ {{ L('Subira ku masomo','Subira ku masomo','Revoir le cours') }}
+              </button>
+
+              <button class="btn-kiza" type="submit">
+                ✓ {{ L('Ohereza ibisubizo ubonereho amanota','Ohereza Ibisubizo','Soumettre le quiz') }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- CERTIFICATE DISPLAY (Shown when student passes) -->
+      {% if p and p.passed and certs.get(c.id) %}
+        <div class="cert-banner">
+          <div style="font-size:42px; margin-bottom:5px;">🏅</div>
+          <small style="letter-spacing:2px; text-transform:uppercase; font-weight:700; color:var(--accent);">
+            {{ L('Verified Course Certificate','Impamyabumenyi Yemejwe','Certificat Vérifié') }}
+          </small>
+          <h2 style="margin:8px 0; font-size:1.5rem;">{{ c.rw if lang=='rw' else c.en }}</h2>
+          <p style="margin-bottom:16px;">
+            {{ u.name }} • Amanota: <strong>{{ certs[c.id].score }}%</strong> • {{ certs[c.id].issued_at[:10] }}
+          </p>
+          <a class="btn-kiza" href="/learning/certificate/{{ certs[c.id].id }}" style="background-color: var(--accent); color:#1c1917; text-decoration:none;">
+            📜 {{ L('Fungura Impamyabumenyi Yawe','Fungura Impamyabumenyi','Ouvrir le certificat') }}
+          </a>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+{% endfor %}
+
+<!-- Interactive Workspace Switcher Script -->
+<script>
+  // Toggle the visible course card
+  function toggleCourseWorkspace(courseId) {
+    const workspace = document.getElementById('workspace-' + courseId);
+    const header = document.getElementById('header-' + courseId);
+    
+    if (workspace.classList.contains('show')) {
+      workspace.classList.remove('show');
+      header.classList.remove('active');
+    } else {
+      // Close other workspaces
+      document.querySelectorAll('.course-body').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('.course-card-header').forEach(el => el.classList.remove('active'));
+      
+      workspace.classList.add('show');
+      header.classList.add('active');
+    }
+  }
+
+  // Switch tabs (Lesson -> Video -> Quiz)
+  function switchCourseTab(courseId, tabName) {
+    // Hide all tab contents in this course
+    const stepContents = document.querySelectorAll(`#workspace-${courseId} .lesson-step-content`);
+    stepContents.forEach(el => el.classList.remove('active'));
+
+    // Deactivate all tab buttons in this course
+    const tabButtons = document.querySelectorAll(`#workspace-${courseId} .tab-btn`);
+    tabButtons.forEach(el => el.classList.remove('active'));
+
+    // Activate current tab
+    document.getElementById(`step-${tabName}-${courseId}`).classList.add('active');
+    document.getElementById(`tab-btn-${tabName}-${courseId}`).classList.add('active');
+  }
+
+  // Action for completing lesson and jumping straight to quiz
+  function unlockQuizAndGo(courseId) {
+    switchCourseTab(courseId, 'quiz');
+  }
+</script>
+{% endblock %}
