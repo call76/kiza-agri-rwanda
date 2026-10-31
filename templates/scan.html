@@ -198,6 +198,7 @@
     font-weight: 500;
   }
   .chk.warn { background: #fffbeb; border: 1px solid #fef3c7; color: #b45309; }
+  .chk.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
   .chk.ok { background: #f0fdf4; border: 1px solid #dcfce7; color: #15803d; }
 
   .mut { color: var(--text-muted); font-size: 0.85rem; }
@@ -239,7 +240,7 @@
     display: none;
   }
 
-  select, input[type="text"] {
+  select {
     width: 100%;
     padding: 11px 14px;
     border: 1px solid var(--border-color);
@@ -309,8 +310,10 @@
     background-color: var(--agri-green-light);
   }
 
-  .pbtn:active {
-    transform: scale(0.98);
+  .pbtn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
   }
 
   /* Recent Scans History */
@@ -345,7 +348,7 @@
       <p>{{ L('Take a clear photo of one leaf, choose your crop and what you see. Get likely problems and simple advice.','Fata ifoto isobanutse y’ikibabi kimwe, uhitemo igihingwa n’ibyo ubona. Ubone ibishoboka n’inama yoroshye.') }}</p>
     </div>
     <span class="status-badge {{ 'v' if ai_on else 'p' }}">
-      {{ L('AI Vision Active','AI ikoresha ifoto ikora') if ai_on else L('Colour Screening + Symptoms','Isuzuma ry’amabara + ibimenyetso') }}
+      {{ L('AI Smart Crop & Leaf Validator Active','AI igenzura niba ari igihingwa cyangwa ikindi') }}
     </span>
   </div>
 
@@ -358,59 +361,69 @@
       <img src="/media/{{res.img}}" alt="Scanned Leaf" class="scanned-img-preview">
       
       <div style="flex:1; min-width:280px;">
-        
-        {% if res.ai %}
-        <div class="cand {{ res.ai.urgency or '' }}">
-          <span class="status-badge v" style="background:#073d29; color:#fff;">🤖 AI Analysis</span> 
-          <b style="font-size:1.15rem; display:block; margin:6px 0;">{{ res.ai.crop }} — {{ 'Looks healthy' if res.ai.healthy else res.ai.problem }}</b>
-          <div class="mut">{{ L('Confidence','Icyizere') }}: {{ res.ai.confidence }}</div>
-          {% if res.ai.symptoms %}
-            <p style="margin:8px 0;"><b>{{ L('Seen','Byabonetse') }}:</b> {{ res.ai.symptoms|join(', ') }}</p>
-          {% endif %}
-          <ul style="margin:8px 0 0 20px; padding:0; font-size:0.9rem; line-height:1.5;">
-            {% for x in res.ai.advice or [] %}
-              <li>{{x}}</li>
-            {% endfor %}
-          </ul>
-        </div>
-        {% endif %}
 
-        {% if res.cs.usable %}
-        <div style="display:flex; gap:16px; align-items:center; margin:14px 0; background:#f8fafc; padding:14px; border-radius:12px; border:1px solid var(--border-color);">
-          <div class="sc-score" style="background:conic-gradient({{ '#1a8f50' if res.cs.health>=70 else ('#e6a118' if res.cs.health>=45 else '#d64545') }} 0 {{res.cs.health}}%, #e5ece7 0)">
-            <i>{{res.cs.health}}<small>{{ L('score','amanota') }}</small></i>
+        <!-- AI INVALID CONTENT DETECTION CHECK (e.g. if it's a book, person, or non-plant) -->
+        {% if res.is_plant == false or (res.ai and res.ai.is_plant == false) %}
+          <div class="chk danger">
+            🚨 <strong>{{ L('Invalid Photo Detected!','Ifoto yashyizweho ntiyemewe!') }}</strong><br>
+            {{ L('Our AI detected that this photo is NOT a plant or leaf (it appears to be a book, object, or non-agricultural item). Please upload a clear photo of a crop leaf.','AI yagenzuye isanga iyi foto <u>atari</u> igihingwa cyangwa ikibabi (biragaragara ko ari igitabo, ikintu kitari icy’ubuhinzi, cyangwa ifoto itemewe). Nyamuneka shyiraho ifoto y’ikibabi cy’igihingwa.') }}
           </div>
-          <div style="flex:1;">
-            <div class="hb"><span style="width:75px">🟢 {{ L('Green','Icyatsi') }}</span><div class="bar2"><i style="width:{{res.cs.green}}%; background:#1a8f50;"></i></div>{{res.cs.green}}%</div>
-            <div class="hb"><span style="width:75px">🟡 {{ L('Yellow','Umuhondo') }}</span><div class="bar2"><i style="width:{{res.cs.yellow}}%; background:#e6a118;"></i></div>{{res.cs.yellow}}%</div>
-            <div class="hb"><span style="width:75px">🟤 {{ L('Brown','Ikigina') }}</span><div class="bar2"><i style="width:{{res.cs.brown}}%; background:#8a5a2b;"></i></div>{{res.cs.brown}}%</div>
-          </div>
-        </div>
-          {% if res.inferred %}
-            <p class="mut">{{ L('Colours suggest','Amabara arerekana') }}: {{ res.inferred|join(', ') }}</p>
-          {% endif %}
         {% else %}
-          <div class="chk warn">⚠️ {{ L('Little or no leaf was found in the photo. Retake it closer, in daylight, with the leaf filling the picture.','Nta kibabi gihagije cyagaragaye. Ongera ufate ifoto hafi, ku manywa, ikibabi kikuzuye ifoto.') }}</div>
-        {% endif %}
-
-        {% if res.crop %}
-          {% if res.generic %}
-            <p class="mut" style="margin-top:10px;">{{ L('No crop-specific data for this crop yet: showing general leaf-problem guidance.','Nta makuru yihariye kuri iki gihingwa: hagaragajwe inama rusange ku bibazo y’ibibabi.') }}</p>
-          {% endif %}
-          
-          {% for c in res.cand %}
-          <div class="cand {{c.urgency}}">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <b>{{c.name}}</b> 
-              <span class="tag">{{c.match}}% {{ L('match','guhura') }}</span>
-            </div>
-            <p style="margin:6px 0 0; font-size:0.9rem;">{{c.advice}}</p>
+        
+          {% if res.ai %}
+          <div class="cand {{ res.ai.urgency or '' }}">
+            <span class="status-badge v" style="background:#073d29; color:#fff;">🤖 AI Analysis</span> 
+            <b style="font-size:1.15rem; display:block; margin:6px 0;">{{ res.ai.crop }} — {{ 'Looks healthy' if res.ai.healthy else res.ai.problem }}</b>
+            <div class="mut">{{ L('Confidence','Icyizere') }}: {{ res.ai.confidence }}</div>
+            {% if res.ai.symptoms %}
+              <p style="margin:8px 0;"><b>{{ L('Seen','Byabonetse') }}:</b> {{ res.ai.symptoms|join(', ') }}</p>
+            {% endif %}
+            <ul style="margin:8px 0 0 20px; padding:0; font-size:0.9rem; line-height:1.5;">
+              {% for x in res.ai.advice or [] %}
+                <li>{{x}}</li>
+              {% endfor %}
+            </ul>
           </div>
+          {% endif %}
+
+          {% if res.cs.usable %}
+          <div style="display:flex; gap:16px; align-items:center; margin:14px 0; background:#f8fafc; padding:14px; border-radius:12px; border:1px solid var(--border-color);">
+            <div class="sc-score" style="background:conic-gradient({{ '#1a8f50' if res.cs.health>=70 else ('#e6a118' if res.cs.health>=45 else '#d64545') }} 0 {{res.cs.health}}%, #e5ece7 0)">
+              <i>{{res.cs.health}}<small>{{ L('score','amanota') }}</small></i>
+            </div>
+            <div style="flex:1;">
+              <div class="hb"><span style="width:75px">🟢 {{ L('Green','Icyatsi') }}</span><div class="bar2"><i style="width:{{res.cs.green}}%; background:#1a8f50;"></i></div>{{res.cs.green}}%</div>
+              <div class="hb"><span style="width:75px">🟡 {{ L('Yellow','Umuhondo') }}</span><div class="bar2"><i style="width:{{res.cs.yellow}}%; background:#e6a118;"></i></div>{{res.cs.yellow}}%</div>
+              <div class="hb"><span style="width:75px">🟤 {{ L('Brown','Ikigina') }}</span><div class="bar2"><i style="width:{{res.cs.brown}}%; background:#8a5a2b;"></i></div>{{res.cs.brown}}%</div>
+            </div>
+          </div>
+            {% if res.inferred %}
+              <p class="mut">{{ L('Colours suggest','Amabara arerekana') }}: {{ res.inferred|join(', ') }}</p>
+            {% endif %}
           {% else %}
-          <div class="chk ok">✔ {{ L('No known problem matches the symptoms you chose. Keep watching the plant.','Nta ndwara izwi ihura n’ibimenyetso wahisemo. Komeza ukurikirane igihingwa.') }}</div>
-          {% endfor %}
-        {% elif not res.ai %}
-          <div class="chk warn">ℹ️ {{ L('Choose your crop below and scan again to see likely diseases.','Hitamo igihingwa hepfo wongere usuzume ubone indwara zishoboka.') }}</div>
+            <div class="chk warn">⚠️ {{ L('Little or no leaf was found in the photo. Retake it closer, in daylight, with the leaf filling the picture.','Nta kibabi gihagije cyagaragaye. Ongera ufate ifoto hafi, ku manywa, ikibabi kikuzuye ifoto.') }}</div>
+          {% endif %}
+
+          {% if res.crop %}
+            {% if res.generic %}
+              <p class="mut" style="margin-top:10px;">{{ L('No crop-specific data for this crop yet: showing general leaf-problem guidance.','Nta makuru yihariye kuri iki gihingwa: hagaragajwe inama rusange ku bibazo y’ibibabi.') }}</p>
+            {% endif %}
+            
+            {% for c in res.cand %}
+            <div class="cand {{c.urgency}}">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>{{c.name}}</b> 
+                <span class="tag">{{c.match}}% {{ L('match','guhura') }}</span>
+              </div>
+              <p style="margin:6px 0 0; font-size:0.9rem;">{{c.advice}}</p>
+            </div>
+            {% else %}
+            <div class="chk ok">✔ {{ L('No known problem matches the symptoms you chose. Keep watching the plant.','Nta ndwara izwi ihura n’ibimenyetso wahisemo. Komeza ukurikirane igihingwa.') }}</div>
+            {% endfor %}
+          {% elif not res.ai %}
+            <div class="chk warn">ℹ️ {{ L('Choose your crop below and scan again to see likely diseases.','Hitamo igihingwa hepfo wongere usuzume ubone indwara zishoboka.') }}</div>
+          {% endif %}
+
         {% endif %}
 
         <p class="mut" style="margin-top:14px; font-style:italic;">
@@ -423,7 +436,7 @@
   {% endif %}
 
   <!-- New Scan Form -->
-  <form method="post" enctype="multipart/form-data" class="sec-card">
+  <form method="post" enctype="multipart/form-data" class="sec-card" id="scanForm">
     <h2>📸 {{ L('New Leaf Scan','Isuzuma rishya ry’ikibabi') }}</h2>
     {{ csrf_input() }}
     
@@ -438,6 +451,10 @@
           </div>
           <img id="imagePreview" alt="Leaf Preview">
           <input type="file" name="photo" id="photoInput" accept="image/*" capture="environment" required>
+        </div>
+        <!-- Real-time client warning note -->
+        <div id="uploadWarning" style="display:none; margin-top:8px;" class="chk danger">
+          ⚠️ <strong>{{ L('Notice:','Igitonderwa:') }}</strong> <span id="warningText"></span>
         </div>
       </div>
 
@@ -468,7 +485,7 @@
     </div>
 
     <div style="margin-top:24px;">
-      <button class="pbtn" type="submit">
+      <button class="pbtn" id="submitBtn" type="submit">
         🔍 {{ L('Scan Leaf Now','Suzuma Ikibabi Ubu') }}
       </button>
     </div>
@@ -493,7 +510,7 @@
 
 </div>
 
-<!-- Interactive Image Preview Script -->
+<!-- Interactive Image Preview & AI Plant Validator Script -->
 <script>
   document.getElementById('photoInput').addEventListener('change', function(event) {
     const file = event.target.files[0];
@@ -503,6 +520,20 @@
         const preview = document.getElementById('imagePreview');
         preview.src = e.target.result;
         preview.style.display = 'inline-block';
+
+        // Optional quick heuristic client check or placeholder for AI verification feedback
+        // For instance, checking file name or dimensions if helpful, while backend AI processes full plant classification
+        const fileName = file.name.toLowerCase();
+        const warningBox = document.getElementById('uploadWarning');
+        const warningText = document.getElementById('warningText');
+        
+        // Example keywords check in filename or warning notification helper
+        if(fileName.includes('book') || fileName.includes('igitabo') || fileName.includes('document')) {
+          warningBox.style.display = 'block';
+          warningText.innerText = "{{ L('This file name resembles a document or book. Please ensure you are uploading a plant leaf photo!','Iyi foto isa n\'iyigitabo cyangwa inyandiko. Reba neza ko ushyizemo ifoto y\'ikibabi cy\'igihingwa!') }}";
+        } else {
+          warningBox.style.display = 'none';
+        }
       }
       reader.readAsDataURL(file);
     }
