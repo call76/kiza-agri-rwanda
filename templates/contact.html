@@ -1,0 +1,14 @@
+{% extends 'public.html' %}{% block title %}{{ t('Contact support') }}{% endblock %}
+{% block eyebrow %}{{ t('Support') }}{% endblock %}{% block h1 %}{{ L("We're here to help",'Turi hano kugufasha') }}{% endblock %}
+{% block lead %}{{ L('Tell us what you need. A real person from our team reads every message.','Tubwire icyo ukeneye. Umuntu nyawe wo mu itsinda asoma ubutumwa bwose.') }}{% endblock %}
+{% block page %}<div class="two"><div class="box2"><h2 style="margin-top:0;color:#0b3d24">{{ L('Send a message','Ohereza ubutumwa') }}</h2>
+<form method="post">{{ csrf_input() }}
+<label>{{ t('Full name') }}</label><input name="name" required value="{{ f.get('name') or (prefill.name if prefill) or '' }}">
+<label>{{ L('Phone or email (so we can reply)','Telefone cyangwa imeri (tugusubize)') }}</label><input name="contact" required value="{{ f.get('contact') or (prefill.phone or prefill.email if prefill) or '' }}">
+<label>{{ L('Topic','Ingingo') }}</label><select name="topic">{% for o in ['General','Account / login','Crop advice','Fertilizer','Prices','Marketplace','Report a bug'] %}<option>{{o}}</option>{% endfor %}</select>
+<label>{{ L('Message','Ubutumwa') }}</label><textarea name="message" required maxlength="2000">{{ f.get('message','') }}</textarea>
+<button class="pbtn" style="margin-top:18px;width:100%;justify-content:center">✉️ {{ L('Send message','Ohereza') }}</button></form></div>
+<div>{% if not user %}<a class="chan" href="#assistant" data-ka><i>🤖</i><div><b>{{ L('Ask the assistant','Baza umufasha') }}</b><span>{{ L('Instant answers, any time','Ibisubizo ako kanya, igihe cyose') }}</span></div></a>{% endif %}
+<a class="chan" href="/support"><i>📚</i><div><b>{{ t('Help center') }}</b><span>{{ L('Quick answers to common questions','Ibisubizo ku bibazo bikunze kubazwa') }}</span></div></a>
+<a class="chan" href="/about"><i>🌍</i><div><b>{{ L('About KIZA-AGRI','Ibya KIZA-AGRI') }}</b><span>{{ L('Who we are and what we build','Abo turi bo n’icyo dukora') }}</span></div></a>
+<div class="chan"><i>⏱️</i><div><b>{{ L('Service hours','Amasaha y’akazi') }}</b><span>{{ L('Replies are sent by phone or email from the contact you give. Add the official phone/email here before launch.','Igisubizo cyoherezwa kuri telefone/imeri watanze. Shyiramo nimero/imeri y’ikigo mbere yo gutangira.') }}</span></div></div></div></div>{% endblock %}

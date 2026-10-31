@@ -1,0 +1,37 @@
+{% extends 'base.html' %}{% block title %}{{ L('Season & inputs','Igihembwe n’ifumbire','Saison & intrants') }} · KIZA-AGRI{% endblock %}{% block body %}
+{% set R = (lg=='rw') %}{% set F = (lg=='fr') %}
+<div class="hero2 sn-hero"><div><span class="sn-eyebrow">{{ L('Real data · sourced','Amakuru nyakuri · afite inkomoko','Données réelles · sourcées') }}</span>
+<h1>🌱 {{ L('Season','Igihembwe','Saison') }} {{ label }}</h1>
+<p>{{ s.rwd if R else (s.frd if F else s.en) }}</p></div>
+<div class="pills"><span><b>{{ label }}</b>{{ L('Now','Ubu','Maintenant') }}</span><span><b>{{ sub.rows[0].farmer|default('-') }}</b>{{ L('Urea RWF/kg you pay','Urea RWF/kg wishyura','Urée RWF/kg') }}</span></div></div>
+
+<div class="sec sn-cal"><h3>{{ L('Farming calendar','Kalendari y’ubuhinzi','Calendrier agricole') }}</h3>
+<div class="sn-months">{% for c in cal %}<div class="sn-m s{{ c.s }}{{ ' now' if c.now }}"><b>{{ c.label }}</b><i>{{ c.s }}</i></div>{% endfor %}</div>
+<div class="sn-legend"><span class="sA">A</span> {{ L('Umuhindo: Sep–Feb','Umuhindo: Nzeri–Gashyantare','Umuhindo: sept.–fév.') }} <span class="sB">B</span> {{ L('Itumba: Mar–Jun','Itumba: Werurwe–Kamena','Itumba: mars–juin') }} <span class="sC">C</span> {{ L('Impeshyi: Jul–Sep (marshland / irrigated)','Impeshyi: Nyakanga–Nzeri (ibishanga / kuhira)','Impeshyi: juil.–sept. (marais / irrigué)') }}</div>
+<p class="mut" style="font-size:12.5px;margin-top:8px">{{ L('Source:','Inkomoko:','Source :') }} {{ K.SEASON_SRC[0] }}.</p></div>
+
+<div class="grid g2" style="margin:16px 0">
+<div class="card sn-out"><h3>🌧️ {{ L('Rain outlook','Iteganyagihe ry’imvura','Prévision de pluie') }} · {{ out.period }}</h3>
+<p style="font-size:15.5px;line-height:1.55">{{ out.rw if R else (out.fr if F else out.en) }}</p>
+<p class="mut" style="font-size:12.5px">{{ L('Do now:','Kora ubu:','À faire :') }} {{ L('prepare drains and contour ditches, plant on time, split fertilizer, and do not spread it just before heavy rain.','tegura imiyoboro y’amazi, uhinge ku gihe, ugabanye ifumbire mu byiciro, kandi ntuyishyire imvura nyinshi igiye kugwa.','préparez drains et fossés, semez à temps, fractionnez l’engrais, évitez-le avant de fortes pluies.') }}</p>
+<a class="sn-src" href="{{ out.source[1] }}" target="_blank" rel="noopener">{{ out.source[0] }} ↗</a></div>
+
+<div class="card"><h3>🧪 {{ L('Nkunganire subsidy','Nkunganire y’ifumbire','Subvention Nkunganire') }} · {{ sub.season }}</h3>
+<div class="tw"><table><tr><th>{{ L('Fertilizer','Ifumbire','Engrais') }}</th><th>{{ L('Retail','Isoko','Détail') }}</th><th>{{ L('Govt pays','Leta yishyura','État') }}</th><th>{{ L('You pay','Wishyura','Vous payez') }}</th><th>%</th></tr>
+{% for r in sub.rows %}<tr><td><b>{{ r.name }}</b></td><td>{{ '{:,}'.format(r.retail) if r.retail else '–' }}</td><td>{{ '{:,}'.format(r.govt) if r.govt else '–' }}</td><td><b>{{ '{:,}'.format(r.farmer) if r.farmer else '–' }}</b></td><td>{{ r.pct }}%</td></tr>{% endfor %}</table></div>
+<p class="mut" style="font-size:12.5px">RWF/kg. {{ L('Other blends: subsidy','Izindi mvange: nkunganire','Autres mélanges : subvention') }} {{ sub.other_blends_pct[0] }}–{{ sub.other_blends_pct[1] }}% ({{ L('farmers pay','abahinzi bishyura','prix payé') }} {{ '{:,}'.format(sub.farmer_range_rwf[0]) }}–{{ '{:,}'.format(sub.farmer_range_rwf[1]) }}). {{ L('DAP price was not in the sources found; ask your agro-dealer.','Igiciro cya DAP nticyabonetse; baza umucuruzi.','Prix DAP non publié dans les sources; demandez à l’agro-dealer.') }}</p></div></div>
+
+<div class="sec sn-calc"><h3>🧮 {{ L('How much will I save?','Nzizigama angahe?','Combien vais-je économiser ?') }}</h3>
+<div class="fgrid"><div><label>{{ L('Fertilizer','Ifumbire','Engrais') }}</label><select id="sn-p">{% for r in sub.rows if r.retail %}<option value="{{ r.retail }}|{{ r.farmer }}">{{ r.name }}</option>{% endfor %}</select></div>
+<div><label>{{ L('Quantity (kg)','Ingano (kg)','Quantité (kg)') }}</label><input id="sn-q" type="number" min="1" value="100"></div></div>
+<div class="grid g3" style="margin-top:12px"><div class="kpi"><span>{{ L('Retail cost','Ku isoko','Prix détail') }}</span><b id="sn-a">–</b></div><div class="kpi"><span>{{ L('You pay','Wishyura','Vous payez') }}</span><b id="sn-b">–</b></div><div class="kpi ok"><span>{{ L('You save','Wizigama','Économie') }}</span><b id="sn-c">–</b></div></div>
+<p style="margin-top:12px">📲 {{ sub.register.rw if R else (sub.register.fr if F else sub.register.en) }}</p></div>
+
+<div class="sec"><h3>🌾 {{ L('Crop care tips','Inama ku bihingwa','Conseils par culture') }}</h3>
+<div class="grid g3">{% for c,t in tips.items() %}<div class="card sn-tip"><b>{{ c }}</b><p>{{ t[1] if R else (t[2] if F else t[0]) }}</p></div>{% endfor %}</div>
+<p class="mut" style="font-size:12.5px">{{ L('General guidance, not RAB-certified recommendations. Confirm with your sector agronomist.','Inama rusange, si iza RAB zemejwe. Emeza n’umukozi w’ubuhinzi.','Conseils généraux, pas des recommandations RAB. Confirmez avec l’agronome.') }}</p></div>
+
+<div class="sec"><h3>📚 {{ L('Sources','Inkomoko','Sources') }}</h3><ul class="sn-list">{% for t,u in sub.sources %}<li><a href="{{ u }}" target="_blank" rel="noopener">{{ t }} ↗</a></li>{% endfor %}<li><a href="{{ out.source[1] }}" target="_blank" rel="noopener">{{ out.source[0] }} ↗</a></li></ul>
+<p class="mut" style="font-size:12.5px">{{ L('Facts collected on 9 Oct 2026 from public news reports of MINAGRI and Meteo Rwanda statements. Prices change: confirm at your agro-dealer / Smart Nkunganire.','Amakuru yakusanyijwe 9 Ukwakira 2026 mu makuru ya MINAGRI na Meteo Rwanda. Ibiciro bihinduka: emeza ku mucuruzi / Smart Nkunganire.','Données collectées le 9 oct. 2026 (presse: MINAGRI, Meteo Rwanda). Les prix changent: confirmez chez l’agro-dealer.') }}</p></div>
+<script>(function(){var p=document.getElementById('sn-p'),q=document.getElementById('sn-q');function f(n){return Math.round(n).toLocaleString()+' RWF'}function u(){var v=p.value.split('|'),k=+q.value||0,a=v[0]*k,b=v[1]*k;document.getElementById('sn-a').textContent=f(a);document.getElementById('sn-b').textContent=f(b);document.getElementById('sn-c').textContent=f(a-b)}p.onchange=q.oninput=u;u()})()</script>
+{% endblock %}

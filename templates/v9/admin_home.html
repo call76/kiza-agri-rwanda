@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% block title %}Admin · KIZA-AGRI{% endblock %}{% block body %}
+<div class="hero2 adm"><div><h1>🛡️ Administrator — full control</h1><p>Manage every account, listing, dataset and setting. You can also open every other role's pages.</p></div>
+<div class="pills"><span><b>{{ k.live }}</b>Live listings</span><span><b>{{ k.pending }}</b>Awaiting advisor</span><span><b>{{ k.deals }}</b>Completed deals</span></div></div>
+{% if stale %}<div class="flash err">⚠ Stock mismatch on {{ stale|length }} listing(s) — check Operations.</div>{% endif %}
+<div class="grid g4 ak"><a class="kpi" href="/admin/users?role=farmer"><span>Farmers</span><b>{{ roles.get('farmer',0) }}</b></a><a class="kpi" href="/admin/users?role=extension"><span>Village advisors</span><b>{{ roles.get('extension',0) }}</b></a><a class="kpi" href="/admin/users?role=buyer"><span>Buyers</span><b>{{ roles.get('buyer',0) }}</b></a><a class="kpi" href="/admin/users?role=government"><span>Government</span><b>{{ roles.get('government',0) }}</b></a>
+<a class="kpi" href="/admin/users?role=admin"><span>Admins</span><b>{{ roles.get('admin',0) }}</b></a><div class="kpi"><span>Farms · hectares planted</span><b>{{ k.farms }} · {{ k.ha|round|int }}</b></div><div class="kpi"><span>Deal value completed</span><b>{{ rwf(k.gmv) }}</b></div><div class="kpi"><span>Scheduled harvests</span><b>{{ k.sched }}</b></div></div>
+
+<h2 style="margin-top:22px">Control center</h2>
+<div class="grid g3 tiles">
+<a class="tile2" href="/admin/users"><i>👥</i><b>Users</b><span>Create, block, reset passwords · {{ k.blocked }} blocked</span></a>
+<a class="tile2" href="/admin/advisors"><i>🧑🏾‍🌾</i><b>Village advisors</b><span>One advisor per village</span></a>
+<a class="tile2" href="/admin/listings"><i>🛒</i><b>Marketplace</b><span>{{ k.live }} live · {{ k.offers }} offers waiting</span></a>
+<a class="tile2" href="/admin/govdata"><i>📈</i><b>Government data</b><span>Poverty rates & production history</span></a>
+<a class="tile2" href="/admin/data"><i>🗂️</i><b>Data uploads</b><span>Crops, prices, districts, LUC, Imihigo</span></a>
+<a class="tile2" href="/admin/broadcast"><i>📣</i><b>Announcements</b><span>Message farmers, buyers, advisors</span></a>
+<a class="tile2" href="/support/inbox"><i>✉️</i><b>Support inbox</b><span>{{ k.tickets }} new</span></a>
+<a class="tile2" href="/distress/inbox"><i>📢</i><b>Distress reports</b><span>{{ k.distress }} open</span></a>
+<a class="tile2" href="/issues/inbox"><i>🩺</i><b>Farm problems</b><span>{{ k.issues }} open</span></a>
+<a class="tile2" href="/verify"><i>✔</i><b>Verify harvests</b><span>Act as any advisor</span></a>
+<a class="tile2" href="/gov"><i>🏛️</i><b>Government view</b><span>Poverty & production</span></a>
+<a class="tile2" href="/admin/learning/questions"><i>🎓</i><b>Learning & question bank</b><span>Add questions, verify trusted sources and manage certification</span></a>
+<a class="tile2" href="/admin/ops"><i>🛠</i><b>Operations</b><span>Pipelines, SMS, models, health</span></a>
+<a class="tile2" href="/audit"><i>🧾</i><b>Audit log</b><span>Who did what</span></a>
+<a class="tile2" href="/admin/settings"><i>⚙️</i><b>Site settings</b><span>Contact details & social links</span></a>
+<a class="tile2" href="/admin/export/listings.csv"><i>⬇</i><b>Export data</b><span>Listings CSV (more in Data)</span></a>
+</div>
+<div class="grid g2" style="margin-top:16px"><div class="card"><h3>🆕 Newest accounts</h3>{% for u in news %}<div class="mv"><b>{{ u.name }}</b><span><span class="tag">{{ u.role }}</span> {{ u.district }}</span></div>{% endfor %}</div>
+<div class="card"><h3>🧾 Latest activity</h3>{% for l in logs %}<div class="mv"><b>{{ l.action }}</b><span class="mut">{{ l.uname or '—' }} · {{ l.created_at[:16] }}</span></div>{% else %}<p class="mut">No activity.</p>{% endfor %}</div></div>
+{% include 'v11/_tools.html' %}{% endblock %}

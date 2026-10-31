@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block title %}My farmers · KIZA-AGRI{% endblock %}{% block body %}
+<div class="hero2"><div><h1>👩🏾‍🌾 My farmers</h1><p>Farmers in your area. You can also register a farmer who has no smartphone.</p></div></div>
+<form class="sec" method="get"><div class="fgrid"><div><label>🔍</label><input name="q" value="{{ f.q or '' }}" placeholder="Name or phone"></div><div><label>&nbsp;</label><button style="width:100%">Search</button></div></div></form>
+<div class="sec"><div class="tw"><table><tr><th>Farmer</th><th>Phone</th><th>Place</th><th>Farms</th><th>Hectares</th><th>Crops</th><th>Listings</th></tr>
+{% for r in rows %}<tr><td><b>{{ r.name }}</b></td><td>{{ r.phone or '–' }}</td><td>{{ r.district }} · {{ r.sector }}{% if r.village %} · {{ r.village }}{% endif %}</td><td>{{ r.farms }}</td><td>{{ r.ha }}</td><td>{{ r.crops or '–' }}</td><td>{{ r.listings }}</td></tr>{% else %}<tr><td colspan="7" class="mut">No farmers found.</td></tr>{% endfor %}</table></div></div>
+<div class="sec"><h2>➕ Register a farmer</h2><form method="post" class="fgrid">{{ csrf_input() }}<div><label>Full name</label><input name="name" required></div><div><label>Phone number</label><input name="phone" placeholder="0788 123 456" required></div>
+{% if user.role=='admin' %}<div><label>District</label><select name="district">{% for d in ds %}<option>{{ d.name }}</option>{% endfor %}</select></div><div><label>Village</label><input name="village" required></div>{% endif %}
+<div><label>Sector</label><input name="sector" value="{{ user.sector or '' }}" required></div><div><label>&nbsp;</label><button style="width:100%">Create account</button></div></form><p class="mut">A password is generated and shown once. Give it to the farmer.</p></div>
+{% endblock %}

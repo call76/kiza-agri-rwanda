@@ -1,0 +1,24 @@
+# Render.com blueprint (free web service). Push the repo to GitHub, then: New > Blueprint > pick the repo.
+services:
+  - type: web
+    name: kiza-agri-rwanda
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    healthCheckPath: /welcome
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: KIZA_DEMO          # seeds the demo database (sample accounts below) on first start
+        value: "1"
+      - key: KIZA_AUTO_SYNC     # free tier sleeps; no background refresh
+        value: "0"
+      - key: KIZA_JOBS
+        value: "0"
+      - key: KIZA_DB
+        value: /tmp/kiza.db     # free-tier disk is wiped on spin-down; the demo data is re-seeded automatically
+      - key: KIZA_SECRET
+        generateValue: true
+      - key: KIZA_DATAGOV_KEY   # data.gov.rw API key: paste it in the Render dashboard (Environment), never in Git
+        sync: false

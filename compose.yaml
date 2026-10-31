@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    ports: ["5000:5000"]
+    env_file: .env
+    volumes: ["kiza-data:/app/data_store"]
+    environment: { KIZA_DB: /app/data_store/kiza.db, KIZA_PRIVATE_UPLOADS: /app/data_store/private }
+volumes: { kiza-data: {} }

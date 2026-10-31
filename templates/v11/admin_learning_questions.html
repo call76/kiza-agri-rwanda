@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% block title %}Question bank · KIZA-AGRI{% endblock %}{% block body %}
+<style>
+.learn-admin{max-width:1120px;margin:auto}.learn-hero{padding:28px;border-radius:22px;background:linear-gradient(120deg,#073d29,#16734b);color:white;margin-bottom:18px}.learn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}.learn-admin .card{padding:20px;border:1px solid var(--line,#ddd);border-radius:18px}.learn-admin input,.learn-admin select,.learn-admin textarea{width:100%;padding:11px;border:1px solid #ccd7cf;border-radius:10px;margin:5px 0 12px}.learn-admin label{font-weight:700}.qrow{padding:14px 0;border-bottom:1px solid #e5e9e5}.pill-ok{color:#087443;font-weight:800}.pill-wait{color:#9a5c00;font-weight:800}
+</style>
+<div class="learn-admin"><div class="learn-hero"><h1>🎓 Ikigo cy'ibizamini n'impamyabumenyi</h1><p>Admin yongeramo ibibazo bifite inkomoko y'amakuru. Ikibazo ntikigaragara mu kizamini kugeza gisuzumwe kandi cyemejwe.</p></div>
+<div class="learn-grid"><section class="card"><h2>➕ Ongeramo ikibazo</h2><form method="post">{{ csrf_input() }}
+<label>Isomo</label><select name="course_id" required>{% for c in courses %}<option value="{{ c.id }}">{{ c.rw }} / {{ c.en }}</option>{% endfor %}</select>
+<label>Ikibazo mu Kinyarwanda</label><textarea name="question_rw" rows="3" required minlength="10" placeholder="Andika ikibazo gisobanutse..."></textarea>
+<label>Igisubizo A</label><input name="option" required>
+<label>Igisubizo B</label><input name="option" required>
+<label>Igisubizo C (si ngombwa)</label><input name="option">
+<label>Igisubizo D (si ngombwa)</label><input name="option">
+<label>Nomero y'igisubizo nyacyo (A=0, B=1, C=2, D=3)</label><input type="number" name="answer_index" min="0" max="3" required>
+<label>Impamvu / ibisobanuro</label><textarea name="explanation_rw" rows="2"></textarea>
+<label>Inkomoko yizewe (urugero RAB, MINAGRI, FAO)</label><input name="source_name" required placeholder="RAB — Rwanda Agriculture and Animal Resources Development Board">
+<label>URL y'inyandiko y'inkomoko</label><input type="url" name="source_url" required placeholder="https://...">
+<button class="btn" type="submit">Bika ikibazo kugira ngo gisuzumwe</button></form></section>
+<section class="card"><h2>🛡️ Amabwiriza yo kwemeza</h2><p>Ibibazo byemezwa gusa nyuma yo kugenzura ko:</p><ul><li>Inkomoko ari urwego rwizewe (RAB, MINAGRI, FAO, CGIAR cyangwa kaminuza).</li><li>Igisubizo gihuye n'inyandiko y'inkomoko.</li><li>Amakuru atarashaje kandi ajyanye n'ubuhinzi bwo mu Rwanda.</li><li>Inama y'imiti n'ifumbire itabangamira umutekano.</li></ul><p><b>Impamyabumenyi:</b> umunyeshuri utsinze nibura 67% ahabwa nimero yihariye n'urupapuro rushobora gucapwa no kugenzurwa.</p></section></div>
+<section class="card" style="margin-top:18px"><h2>📚 Ibibazo byashyizwe muri sisitemu</h2>{% for q in questions %}<div class="qrow"><b>{{ q.question_rw }}</b><p class="mut">{{ q.options|join(' · ') }}</p><small>Inkomoko: <a href="{{ q.source_url }}" target="_blank" rel="noopener">{{ q.source_name }}</a> · Byanditswe na {{ q.author or 'Admin' }}</small><p>{% if q.verified %}<span class="pill-ok">✓ Byemejwe — biri mu bizamini</span>{% else %}<span class="pill-wait">⏳ Birategereje isuzuma</span>{% endif %}</p><form method="post" action="/admin/learning/questions/{{ q.id }}/verify">{{ csrf_input() }}<button class="btn sm" type="submit">{{ 'Kuraho icyemezo' if q.verified else 'Emeza nyuma yo kugenzura' }}</button></form></div>{% else %}<p>Nta kibazo cya admin kirashyirwamo.</p>{% endfor %}</section></div>{% endblock %}

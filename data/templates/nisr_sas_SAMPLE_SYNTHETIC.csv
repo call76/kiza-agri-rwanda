@@ -1,0 +1,6 @@
+publication,year,season,table_ref,indicator,geography,crop,unit,value,source_url,is_official
+"SYNTHETIC SAMPLE (NOT NISR DATA) - layout of Seasonal Agricultural Survey tables",2024,A,"illustrative",Harvested area,Musanze,Maize,ha,1000,,0
+"SYNTHETIC SAMPLE (NOT NISR DATA) - layout of Seasonal Agricultural Survey tables",2024,A,"illustrative",Production,Musanze,Maize,tonnes,2500,,0
+"SYNTHETIC SAMPLE (NOT NISR DATA) - layout of Seasonal Agricultural Survey tables",2024,A,"illustrative",Yield,Musanze,Maize,kg/ha,2500,,0
+"SYNTHETIC SAMPLE (NOT NISR DATA) - layout of Seasonal Agricultural Survey tables",2024,A,"illustrative",Harvested area,Huye,Beans,ha,800,,0
+"SYNTHETIC SAMPLE (NOT NISR DATA) - layout of Seasonal Agricultural Survey tables",2024,A,"illustrative",Production,Huye,Beans,tonnes,720,,0

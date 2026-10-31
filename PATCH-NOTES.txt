@@ -1,0 +1,19 @@
+KIZA AGRI RWANDA — PATCH NOTES
+
+Applied in this package:
+- Added static/photos/hero.jpg, an original AI-generated 1672x941 JPEG for the existing landing/welcome/auth hero styles.
+- Updated README.md to document the asset and its illustrative nature.
+
+Checks completed in this environment:
+- Python source syntax: 56 files parsed successfully.
+- JavaScript syntax: all top-level static/*.js files passed `node --check`.
+- Confirmed the hero asset now exists at the path requested by the CSS.
+
+Checks not completed:
+- Full Flask integration/unit tests could not run because Flask/Werkzeug and pytest are not installed in the execution environment, and package installation was unavailable (no network access). Run `pip install -r requirements.txt` and `python -m pytest -q` on a machine with internet/package access.
+- External live integrations (Open-Meteo, data.gov.rw, SMS, deployment) require their normal network access and credentials and were not verified here.
+
+Important:
+- This package preserves the existing app and database; it does not claim that every possible runtime/deployment error has been eliminated.
+- Configure KIZA_SECRET and any integration credentials in your deployment environment. Never publish your .env or .secret_key.
+\n\nKIZA-AGRI PREMIUM UPDATE — LEARNING & CERTIFICATION\n- Admin question bank at /admin/learning/questions; question submissions require a named source and URL.\n- Questions remain out of quizzes until an administrator reviews and verifies them.\n- Passing learners receive a unique platform-issued certificate with public verification URL and print/PDF support. Existing passed learners are backfilled during migration.\n- Note: KIZA-AGRI certificates confirm completion of platform training; they are not government or university-accredited qualifications.\n

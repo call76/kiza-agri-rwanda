@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block body %}<h1>✔ {{ T('hv.title') }}</h1><p class="mut">{{ T('hv.intro') }}</p>
+<div class="card tw"><table><tr><th>{{ T('rec.field') }}</th><th>{{ T('hv.farmer') }}</th><th>{{ T('rec.year') }}</th><th>{{ T('rec.estimated_kg') }}</th><th>{{ T('rec.actual_kg') }}</th><th>{{ T('hv.decision') }}</th></tr>
+{% for r in rows %}<tr><td>{{ r.farm }} · {{ r.field }} ({{ r.crop }})</td><td>{{ r.farmer }}<div class="mut">{{ r.district }}</div></td><td>{{ r.season_year }}{{ r.season }}</td><td>{{ nf(r.estimated_kg) }}</td><td><b>{{ nf(r.actual_kg) }}</b> kg</td>
+<td><form method="post" class="fl2">{{ csrf_input() }}<input type="hidden" name="id" value="{{ r.id }}"><input name="note" maxlength="300" placeholder="{{ T('hv.reason_ph') }}" aria-label="{{ T('hv.reason') }}"><button name="act" value="verify" class="sm">{{ T('hv.verify') }}</button> <button name="act" value="reject" class="sm bad">{{ T('hv.reject') }}</button></form></td></tr>
+{% else %}<tr><td colspan="6" class="mut">{{ T('hv.empty') }}</td></tr>{% endfor %}</table></div>{% endblock %}

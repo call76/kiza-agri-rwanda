@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block title %}{{ L('History','Amateka','Histoire') }} · KIZA-AGRI{% endblock %}{% block body %}
+<div class="v11-h"><h1>📜 {{ L('History','Amateka','Histoire') }}</h1><p>{{ L("Where Rwandan farming has come from, and your own farm's story on KIZA-AGRI.","Aho ubuhinzi bw'u Rwanda bukomoka, n'inkuru y'umurima wawe kuri KIZA-AGRI.","D'où vient l'agriculture rwandaise, et l'histoire de votre ferme.") }}</p></div>
+{% if user.role=='farmer' %}
+<div class="card hs"><h3>🌾 {{ L('My farm story','Inkuru y’umurima wanjye','Mon histoire') }}</h3>
+{% if ev %}<p class="hs-sum">{{ L('With KIZA since','Uri kumwe na KIZA kuva','Avec KIZA depuis') }} <b>{{ since }}</b> · <b>{{ days }}</b> {{ L('days','iminsi','jours') }}</p>
+<div class="hs-k"><span>🏡 {{ kinds.farm }}</span><span>🌱 {{ kinds.plant }}</span><span>🌾 {{ kinds.harvest }}</span><span>🧴 {{ kinds.spray }}</span><span>🛒 {{ kinds.list }}</span><span>🤝 {{ kinds.sale }}</span><span>🏅 {{ kinds.badge }}</span></div>
+<ol class="tl">{% for d,ic,k,t,s in ev %}<li><i>{{ ic }}</i><div><small>{{ d }}</small><b>{{ t }}</b>{% if s %}<span>{{ s }}</span>{% endif %}</div></li>{% endfor %}</ol>
+{% else %}<p class="mut">{{ L('Your story starts with your first farm. Add one and every field, spray and sale will appear here.','Inkuru yawe itangira ku murima wa mbere. Wandikishe umurima, buri gihingwa, umuti n’igurisha bizagaragara hano.','Votre histoire commence avec votre première ferme.') }} <a class="btn sm" href="/farms">{{ L('Add a farm','Ongeramo umurima','Ajouter') }}</a></p>{% endif %}</div>
+{% endif %}
+<div class="card hs"><h3>🇷🇼 {{ L("Rwanda's agriculture story","Amateka y'ubuhinzi bw'u Rwanda","L'agriculture rwandaise") }}</h3>
+<ol class="tl big">{% for y,ic,en,rwt,s in rw %}<li><i>{{ ic }}</i><div><small>{{ y }}</small><b>{{ rwt if lg=='rw' else en }}</b></div></li>{% endfor %}</ol>
+<p class="mut" style="font-size:12px">{{ L('Sources','Aho amakuru aturuka','Sources') }}: {% for n,u2 in src %}<a href="{{ u2 }}" target="_blank" rel="noopener noreferrer">{{ n }}</a>{{ ' · ' if not loop.last }}{% endfor %}. {{ L('Figures are quoted as reported by these sources.','Imibare ni uko yatangajwe n’aya masoko.','Chiffres tels que rapportés.') }}</p></div>
+{% endblock %}

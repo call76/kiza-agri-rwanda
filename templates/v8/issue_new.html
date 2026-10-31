@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% block body %}<h1>＋ {{ T('iss.new') }}</h1>
+<div class="card"><form method="post" enctype="multipart/form-data" class="fgrid">{{ csrf_input() }}
+<div><label>{{ T('rec.field') }}</label><select name="field_id"><option value="">{{ T('iss.whole_farm') }}</option>{% for x in fields %}<option value="{{x.id}}" {{ 'selected' if f.field_id==x.id|string }}>{{x.farm}} · {{x.name}} ({{x.crop}})</option>{% endfor %}</select></div>
+<div><label>{{ T('iss.farm') }}</label><select name="farm_id"><option value="">–</option>{% for x in farms %}<option value="{{x.id}}">{{x.name}}</option>{% endfor %}</select></div>
+<div><label>{{ T('iss.category') }}</label><select name="category" required>{% for c in cats %}<option value="{{c}}" {{ 'selected' if f.category==c }}>{{ T('cat.' ~ c) }}</option>{% endfor %}</select></div>
+<div><label>{{ T('iss.urgency') }}</label><select name="urgency">{% for u in urg %}<option value="{{u}}" {{ 'selected' if (f.urgency or 'normal')==u }}>{{ T('urg.' ~ u) }}</option>{% endfor %}</select></div>
+<div><label>{{ T('iss.observed_on') }}</label><input type="date" name="observed_on" value="{{ today }}" max="{{ today }}"></div>
+<div style="grid-column:1/-1"><label>{{ T('iss.description') }}</label><textarea name="description" rows="4" required minlength="10" maxlength="2000" placeholder="{{ T('iss.description_ph') }}">{{ f.description }}</textarea></div>
+<div><label>{{ T('iss.photo') }}</label><input type="file" name="photo" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="mut">{{ T('iss.photo_help') }}</div></div>
+<div><label>{{ T('iss.lat') }}</label><input name="lat" id="lat" type="number" step="any" min="-3" max="0"></div><div><label>{{ T('iss.lng') }}</label><input name="lng" id="lng" type="number" step="any" min="28" max="31"></div>
+<div><button type="button" class="sm" onclick="navigator.geolocation&&navigator.geolocation.getCurrentPosition(function(p){document.getElementById('lat').value=p.coords.latitude.toFixed(5);document.getElementById('lng').value=p.coords.longitude.toFixed(5)})">📍 {{ T('iss.use_location') }}</button></div>
+<div style="grid-column:1/-1"><button>{{ T('iss.submit') }}</button></div></form></div>{% endblock %}

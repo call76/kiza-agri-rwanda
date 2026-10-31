@@ -1,0 +1,20 @@
+{% extends 'base.html' %}{% block title %}Production · KIZA-AGRI{% endblock %}{% block body %}
+{% set n = m.nat %}
+<div class="hero2 gov"><div><h1>🌾 Annual production — 30 districts</h1><p>Whole-year production per district, compared with the previous year: did it rise or fall?</p></div></div>
+{% if m.demo %}<div class="note"><span>This is a <b>DEMO series</b> until official data is uploaded by the administrator.</span></div>{% endif %}
+<form class="sec" method="get"><div class="fgrid"><div><label>Year</label><select name="year">{% for y in m.years|reverse %}<option {{ 'selected' if y==n.year }}>{{ y }}</option>{% endfor %}</select></div>
+<div><label>Crop</label><select name="crop"><option value="">All crops</option>{% for c in crops %}<option {{ 'selected' if m.crop==c }}>{{ c }}</option>{% endfor %}</select></div>
+<div><label>Sort</label><select name="sort"><option value="name" {{ 'selected' if sort=='name' }}>District name</option><option value="pct" {{ 'selected' if sort=='pct' }}>Biggest rise first</option><option value="down" {{ 'selected' if sort=='down' }}>Biggest fall first</option><option value="tonnes" {{ 'selected' if sort=='tonnes' }}>Highest production</option></select></div>
+<div><label>&nbsp;</label><button style="width:100%">Show</button></div><div><label>&nbsp;</label><a class="btn alt" style="width:100%;text-align:center" href="?csv=1&year={{ n.year }}&crop={{ m.crop or '' }}">⬇ Download CSV</a></div></div></form>
+
+<div class="card verdict {{ n.verdict }}"><div class="vbig">{% if n.verdict=='rise' %}▲{% elif n.verdict=='fall' %}▼{% else %}≈{% endif %}</div>
+<div><h2 style="margin:0">{% if n.verdict=='rise' %}National production ROSE {{ n.pct }}%{% elif n.verdict=='fall' %}National production FELL {{ -n.pct }}%{% else %}National production: no clear change{% endif %}</h2>
+<p class="mut" style="margin:4px 0 0">{{ n.year }}: {{ (n.cur or 0)|round|int }} tonnes · {{ n.prev }}: {{ (n.prev_t or 0)|round|int }} tonnes{% if m.crop %} · crop: {{ m.crop }}{% endif %}</p>
+<p style="margin:6px 0 0"><b class="up">▲ {{ n.rise }}</b> districts rose · <b class="dn">▼ {{ n.fall }}</b> districts fell</p></div></div>
+<div class="card"><h3>National production by year (tonnes)</h3>{{ chart }}</div>
+
+<h2>District by district</h2>
+<div class="dgrid">{% for r in rows %}<div class="dcard {{ r.verdict }}"><div class="dh"><b>{{ r.name }}</b><span class="mut">{{ r.province }}</span></div>
+<div class="dv">{% if r.pct is none %}<span class="mut">No data</span>{% elif r.verdict=='rise' %}<span class="up">▲ {{ r.pct }}%</span>{% elif r.verdict=='fall' %}<span class="dn">▼ {{ -r.pct }}%</span>{% else %}<span class="mut">● {{ r.pct }}%</span>{% endif %}</div>
+<div class="sp">{{ r.spark }}</div><div class="mut">{% if r.cur is not none %}{{ r.cur|round|int }} t{% else %}–{% endif %} · {{ n.year }}</div></div>{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+<header class="top"><div class="wrap"><a class="logo" href="/">KIZA<b>-AGRI</b></a><button class="menu-btn" type="button" aria-label="Menu">☰</button>
+<nav>
+<div class="dd"><button class="dt" type="button" aria-haspopup="true">{{ t('Platform') }}</button><div class="menu">
+<a href="/#features"><i>🌾</i><span>{{ t('Features') }}<small>{{ L('Advisor, weather, fertilizer, prices','Inama, ikirere, ifumbire, ibiciro') }}</small></span></a>
+<a href="/reference-prices"><i>🧺</i><span>{{ L('Food prices','Ibiciro by’ibiribwa') }}<small>{{ L('Kigali markets + basket','Amasoko y’i Kigali + calculator') }}</small></span></a>
+<a href="/#how"><i>🧭</i><span>{{ t('How it works') }}<small>{{ L('4 simple steps','Intambwe 4 koroshye') }}</small></span></a>
+<a href="/#audiences"><i>👥</i><span>{{ L("Who it's for",'Ugenewe') }}<small>{{ L('Farmers · Buyers · Government','Abahinzi · Abaguzi · Leta') }}</small></span></a>
+<hr><a href="/market"><i>🛒</i><span>{{ t('Marketplace') }}</span></a><a href="/prices"><i>📈</i><span>{{ t('Prices') }}</span></a></div></div>
+<div class="dd"><button class="dt" type="button" aria-haspopup="true">{{ t('Support') }}</button><div class="menu">
+<a href="/support"><i>📚</i><span>{{ t('Help center') }}<small>FAQ</small></span></a>
+<a href="/contact"><i>✉️</i><span>{{ t('Contact support') }}<small>{{ L('We reply fast','Turasubiza vuba') }}</small></span></a>
+<a href="#assistant" data-ka><i>🤖</i><span>{{ t('Assistant') }}<small>{{ L('Instant answers','Ibisubizo ako kanya') }}</small></span></a></div></div>
+<a class="h" href="/about">{{ t('About') }}</a>
+<div class="dd right"><button class="dt" type="button">🌐 {{ lang|upper }}</button><div class="menu"><a href="/lang/en">🇬🇧 English</a><a href="/lang/rw">🇷🇼 Kinyarwanda</a><a href="/lang/fr">🇫🇷 Français</a></div></div>
+{% if user %}<a class="b sun sm" href="{{ home_url }}">{{ L('Open my dashboard','Fungura dashboard') }}</a>
+{% else %}<a class="h" href="/login">{{ t('Login') }}</a><a class="b green sm" href="/register">{{ t('Get started') }}</a>{% endif %}
+</nav></div></header>

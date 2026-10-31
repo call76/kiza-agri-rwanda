@@ -1,0 +1,1 @@
+[["^Welcome back, (.+?)( 👋)?$", "Bon retour, \\1\\2"], ["^Welcome, (.+)$", "Bienvenue, \\1"], ["^Advice for (.+)$", "Conseils pour \\1"], ["^Village advisor — (.+)$", "Conseiller de village — \\1"]]

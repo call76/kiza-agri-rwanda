@@ -1,0 +1,13 @@
+KIZA AGRI MAGIC+ UPDATE
+
+New interface enhancements:
+- Searchable command palette opened with Ctrl+K / Cmd+K or the KIZA MAGIC button.
+- Searches existing navigation links and common agriculture tools.
+- Online/offline status notifications.
+- Back-to-top shortcut.
+- PWA install prompt where the browser supports installation.
+- Service worker cache version bumped so the new script is refreshed.
+
+These are interface/navigation improvements. They do not create new backend APIs,
+AI diagnosis models, live weather feeds, payment systems, or external integrations.
+Existing app routes and backend permissions remain authoritative.

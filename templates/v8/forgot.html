@@ -1,0 +1,2 @@
+{% extends 'base.html' %}{% block body %}<h1>🔑 {{ T('sec.forgot_title') }}</h1><p class="mut">{{ T('sec.forgot_help') }}</p>
+<div class="card"><form method="post">{{ csrf_input() }}<label for="ident">{{ T('sec.email') }}</label><input id="ident" name="ident" type="email" required autocomplete="email" placeholder="{{ T('sec.email_ph') }}">{% if request.environ.get('KIZA_CAPTCHA_SITEKEY') %}{% endif %}<p><button>{{ T('sec.send_link') }}</button> <a href="/login">{{ T('sec.back_login') }}</a></p></form></div>{% endblock %}

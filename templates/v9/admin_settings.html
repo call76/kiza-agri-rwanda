@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}Site settings · KIZA-AGRI{% endblock %}{% block body %}
+<div class="hero2 adm"><div><h1>⚙️ Site settings</h1><p>Contact details and social links shown in the header and footer.</p></div></div>
+<form class="sec" method="post">{{ csrf_input() }}<div class="fgrid">
+<div><label>Contact email</label><input name="contact_email" type="email" value="{{ s.contact_email }}"></div><div><label>Phone number</label><input name="contact_phone" value="{{ s.contact_phone }}"></div>
+<div><label>WhatsApp number (digits only, with country code)</label><input name="contact_whatsapp" value="{{ s.contact_whatsapp }}"></div><div><label>Address</label><input name="contact_address" value="{{ s.contact_address }}"></div>
+<div><label>Facebook link</label><input name="facebook" value="{{ s.facebook }}"></div><div><label>X (Twitter) link</label><input name="x" value="{{ s.x }}"></div><div><label>Instagram link</label><input name="instagram" value="{{ s.instagram }}"></div><div><label>YouTube link</label><input name="youtube" value="{{ s.youtube }}"></div><div><label>LinkedIn link</label><input name="linkedin" value="{{ s.linkedin }}"></div></div>
+<p><button class="pbtn">Save</button></p></form>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block title %}Poverty ranking · KIZA-AGRI{% endblock %}{% block body %}
+<div class="hero2 gov"><div><h1>📉 Districts ranked by poverty</h1><p>All 30 districts, from the highest poverty rate to the lowest. The need index adds production decline and open distress reports.</p></div></div>
+<form class="sec" method="get"><div class="fgrid"><div><label>Province</label><select name="province"><option value="">All provinces</option>{% for p in provinces %}<option {{ 'selected' if prov==p }}>{{ p }}</option>{% endfor %}</select></div>
+<div><label>&nbsp;</label><button style="width:100%">Filter</button></div><div><label>&nbsp;</label><a class="btn alt" style="width:100%;text-align:center" href="?csv=1&province={{ prov }}">⬇ Download CSV</a></div></div></form>
+<div class="card"><h3>Poverty rate by district</h3>{{ bars }}<p class="mut">Source: {{ src.s }}. {% if not src.o %}Not yet confirmed by an administrator.{% endif %} National rate {{ m.nat.national_poverty }}%.</p></div>
+<div class="sec"><div class="tw"><table><tr><th>Rank</th><th>District</th><th>Province</th><th>Poverty rate</th><th>Production change</th><th>Open distress</th><th>Farmers on KIZA</th><th>Need index</th></tr>
+{% for r in rows %}<tr><td>{{ loop.index }}</td><td><b>{{ r.name }}</b></td><td>{{ r.province }}</td><td>{{ r.poverty if r.poverty is not none else '–' }}%{% if r.poverty and r.poverty>m.nat.national_poverty %} <span class="tag bad">above national</span>{% endif %}</td>
+<td>{% if r.pct is none %}–{% elif r.pct>=1 %}<span class="up">▲ {{ r.pct }}%</span>{% elif r.pct<=-1 %}<span class="dn">▼ {{ -r.pct }}%</span>{% else %}●{% endif %}</td><td>{{ r.dist }}</td><td>{{ r.farmers }}</td><td><span class="need" style="background:{{ r.color }}">{{ r.need|round|int }}</span></td></tr>{% endfor %}</table></div></div>
+{% endblock %}

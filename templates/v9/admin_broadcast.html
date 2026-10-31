@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block title %}Announcements · KIZA-AGRI{% endblock %}{% block body %}
+<div class="hero2 adm"><div><h1>📣 Announcements</h1><p>Send a message to users' notification inbox.</p></div></div>
+<form class="sec" method="post">{{ csrf_input() }}<div class="fgrid"><div><label>To</label><select name="role"><option value="">Everyone</option><option value="farmer">Farmers</option><option value="buyer">Buyers</option><option value="extension">Village advisors</option><option value="government">Government</option></select></div>
+<div><label>District (optional)</label><select name="district"><option value="">All districts</option>{% for d in ds %}<option>{{ d.name }}</option>{% endfor %}</select></div><div class="full"><label>Message</label><textarea name="message" rows="3" maxlength="300" required style="width:100%"></textarea></div></div><p><button class="pbtn">📣 Send</button></p></form>
+{% endblock %}

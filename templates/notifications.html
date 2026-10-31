@@ -1,0 +1,708 @@
+
+{% extends 'base.html' %}
+{% block body %}
+
+<style>
+.notifications-page {
+    max-width:1200px;
+    margin:25px auto;
+    padding:15px;
+    color:#193b2b;
+}
+
+.notification-header {
+    background:linear-gradient(120deg,#064e32,#119957);
+    color:white;
+    padding:35px;
+    border-radius:22px;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:25px;
+    box-shadow:0 10px 30px #075b3820;
+}
+
+.notification-header h1 {
+    color:white;
+    font-size:30px;
+    font-weight:800;
+    margin:0 0 10px;
+}
+
+.notification-header p {
+    color:#d8f5e3;
+    margin:0;
+}
+
+.header-icon {
+    position:absolute;
+    right:40px;
+    top:15px;
+    font-size:90px;
+    opacity:.17;
+}
+
+.notification-stats {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin-bottom:25px;
+}
+
+.stat-card {
+    background:white;
+    padding:22px;
+    border-radius:17px;
+    border:1px solid #e6eee8;
+    box-shadow:0 5px 18px #00000008;
+}
+
+.stat-card span {
+    color:#74867a;
+    font-size:13px;
+    font-weight:600;
+}
+
+.stat-card h2 {
+    font-size:28px;
+    color:#078349;
+    margin:8px 0 0;
+}
+
+.notification-container {
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    border:1px solid #e6eee8;
+    box-shadow:0 5px 20px #00000007;
+}
+
+.toolbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:20px 0;
+}
+
+.search-box {
+    flex:1;
+    min-width:220px;
+}
+
+.search-box input {
+    width:100%;
+    padding:13px 16px;
+    border:1px solid #dce8df;
+    border-radius:12px;
+    outline:none;
+    font-size:14px;
+}
+
+.search-box input:focus {
+    border-color:#109755;
+    box-shadow:0 0 0 3px #10975518;
+}
+
+.action-btn {
+    border:none;
+    padding:11px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:12px;
+    transition:.2s;
+}
+
+.green-btn {
+    background:#087d46;
+    color:white;
+}
+
+.green-btn:hover {
+    background:#055e35;
+}
+
+.light-btn {
+    background:#eaf5ed;
+    color:#087d46;
+}
+
+.red-btn {
+    background:#fff0ef;
+    color:#c0392b;
+}
+
+.filter-tabs {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.filter-btn {
+    border:1px solid #e0eae2;
+    background:#f7faf7;
+    padding:9px 16px;
+    border-radius:20px;
+    color:#547060;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:700;
+}
+
+.filter-btn.active {
+    background:#087d46;
+    color:white;
+    border-color:#087d46;
+}
+
+.notification-item {
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:18px;
+    border:1px solid #edf2ee;
+    border-radius:15px;
+    margin-bottom:12px;
+    background:#fbfdfb;
+    transition:.2s;
+}
+
+.notification-item:hover {
+    background:#f0faf3;
+    border-color:#a7d9b6;
+    transform:translateY(-2px);
+}
+
+.notification-item.unread {
+    background:#f0faf3;
+    border-left:4px solid #109755;
+}
+
+.notification-item.hidden {
+    display:none !important;
+}
+
+.notification-icon {
+    width:47px;
+    height:47px;
+    flex-shrink:0;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#e0f4e6;
+    font-size:22px;
+}
+
+.notification-content {
+    flex:1;
+    min-width:0;
+}
+
+.notification-content p {
+    font-size:14px;
+    font-weight:650;
+    color:#244b35;
+    margin:0 0 7px;
+    overflow-wrap:anywhere;
+}
+
+.notification-content small {
+    color:#839087;
+    font-size:12px;
+}
+
+.notification-actions {
+    display:flex;
+    align-items:center;
+    gap:7px;
+    flex-wrap:wrap;
+}
+
+.icon-btn {
+    width:34px;
+    height:34px;
+    border:1px solid #e2ebe4;
+    background:white;
+    border-radius:9px;
+    cursor:pointer;
+    color:#087d46;
+    font-size:15px;
+}
+
+.icon-btn:hover {
+    background:#e5f5e9;
+}
+
+.read-label {
+    color:#087d46;
+    font-size:11px;
+    font-weight:800;
+}
+
+.empty-state {
+    text-align:center;
+    padding:55px 15px;
+}
+
+.empty-state .emoji {
+    font-size:55px;
+}
+
+.empty-state h3 {
+    color:#24543a;
+}
+
+.empty-state p {
+    color:#829087;
+}
+
+.notification-footer {
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:20px;
+    color:#829087;
+    font-size:12px;
+}
+
+@media(max-width:700px) {
+    .notification-stats {
+        grid-template-columns:1fr;
+    }
+
+    .notification-header h1 {
+        font-size:23px;
+    }
+
+    .header-icon {
+        right:15px;
+        font-size:65px;
+    }
+
+    .notification-container {
+        padding:15px;
+    }
+
+    .notification-item {
+        gap:10px;
+        padding:12px;
+        flex-wrap:wrap;
+    }
+
+    .notification-actions {
+        width:100%;
+        justify-content:flex-end;
+    }
+}
+</style>
+
+<div class="notifications-page">
+
+    <!-- HEADER -->
+    <div class="notification-header">
+        <div class="header-icon">🔔</div>
+        <h1>Notifications Center</h1>
+        <p>Welcome to KIZA-AGRI Rwanda. Stay informed and connected with your agricultural activities.</p>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="notification-stats">
+
+        <div class="stat-card">
+            <span>📩 TOTAL NOTIFICATIONS</span>
+            <h2 id="totalCount">{{ ns|length }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <span>🔴 UNREAD NOTIFICATIONS</span>
+            <h2 id="unreadCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <span>✅ READ NOTIFICATIONS</span>
+            <h2 id="readCount">0</h2>
+        </div>
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="notification-container">
+
+        <h2 style="margin:0;font-size:21px;">
+            🔔 Manage Notifications
+        </h2>
+
+        <!-- SEARCH -->
+        <div class="toolbar">
+
+            <div class="search-box">
+                <input
+                    type="search"
+                    id="notificationSearch"
+                    placeholder="🔍 Search notifications..."
+                    oninput="applyFilters()">
+            </div>
+
+            <button class="action-btn green-btn"
+                    onclick="markAllRead()">
+                ✓ Mark All Read
+            </button>
+
+        </div>
+
+        <!-- FILTERS -->
+        <div class="toolbar">
+
+            <div class="filter-tabs">
+                <button class="filter-btn active"
+                        onclick="setFilter('all',this)">
+                    All
+                </button>
+
+                <button class="filter-btn"
+                        onclick="setFilter('unread',this)">
+                    Unread
+                </button>
+
+                <button class="filter-btn"
+                        onclick="setFilter('read',this)">
+                    Read
+                </button>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+
+                <select id="sortOrder"
+                        onchange="sortNotifications()"
+                        style="padding:10px;border:1px solid #dce8df;border-radius:10px;">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                </select>
+
+                <button class="action-btn light-btn"
+                        onclick="exportCSV()">
+                    ⬇ Export CSV
+                </button>
+
+                <button class="action-btn red-btn"
+                        onclick="clearRead()">
+                    🗑 Clear Read
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- NOTIFICATION LIST -->
+        <div id="notificationList">
+
+            {% for n in ns %}
+
+            <div class="notification-item unread"
+                 data-message="{{ n.message|e }}"
+                 data-id="{{ loop.index0 }}"
+                 data-date="{{ n.created_at|e }}">
+
+                <div class="notification-icon">🔔</div>
+
+                <div class="notification-content">
+
+                    <p class="notification-message">
+                        {{ n.message }}
+                    </p>
+
+                    <small>🕒 {{ n.created_at }}</small>
+
+                    <div style="margin-top:6px;">
+                        <span class="read-label">● UNREAD</span>
+                    </div>
+
+                </div>
+
+                <div class="notification-actions">
+
+                    <button class="icon-btn"
+                            title="Mark as read"
+                            onclick="markRead(this)"
+                            type="button">
+                        ✓
+                    </button>
+
+                    <a href="{{ n.link }}"
+                       class="icon-btn"
+                       title="Open notification"
+                       style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                        ↗
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+                <div class="emoji">🔕</div>
+                <h3>No Notifications Yet</h3>
+                <p>New agricultural updates and announcements will appear here.</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- EMPTY SEARCH -->
+        <div id="noResults" class="empty-state" style="display:none;">
+            <div class="emoji">🔍</div>
+            <h3>No Matching Notifications</h3>
+            <p>Try another search or filter.</p>
+        </div>
+
+        <div class="notification-footer">
+            <span>KIZA-AGRI Rwanda | Smart Agriculture Platform</span>
+            <span id="visibleCount">Showing notifications</span>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+(function(){
+
+    const list = document.getElementById('notificationList');
+    const storageKey = 'kiza_agri_read_notifications';
+    let currentFilter = 'all';
+
+    function getReadIds(){
+        try {
+            return JSON.parse(localStorage.getItem(storageKey) || '[]');
+        } catch(e) {
+            return [];
+        }
+    }
+
+    function saveReadIds(ids){
+        localStorage.setItem(storageKey, JSON.stringify(ids));
+    }
+
+    function items(){
+        return Array.from(
+            list.querySelectorAll('.notification-item')
+        );
+    }
+
+    function updateStats(){
+
+        const all = items();
+        const read = all.filter(item =>
+            !item.classList.contains('unread')
+        ).length;
+
+        document.getElementById('totalCount').textContent = all.length;
+        document.getElementById('readCount').textContent = read;
+        document.getElementById('unreadCount').textContent =
+            all.length - read;
+    }
+
+    function restoreRead(){
+
+        const saved = getReadIds();
+
+        items().forEach(item => {
+
+            if(saved.includes(item.dataset.id)){
+                item.classList.remove('unread');
+                item.querySelector('.read-label').textContent = '✓ READ';
+                item.querySelector('.read-label').style.color = '#087d46';
+            }
+
+        });
+
+        updateStats();
+        applyFilters();
+    }
+
+    window.applyFilters = function(){
+
+        const search = document.getElementById(
+            'notificationSearch'
+        ).value.toLowerCase();
+
+        let visible = 0;
+
+        items().forEach(item => {
+
+            const isUnread = item.classList.contains('unread');
+
+            const matchesSearch =
+                item.dataset.message.toLowerCase().includes(search);
+
+            const matchesFilter =
+                currentFilter === 'all' ||
+                (currentFilter === 'unread' && isUnread) ||
+                (currentFilter === 'read' && !isUnread);
+
+            const show = matchesSearch && matchesFilter;
+
+            item.classList.toggle('hidden', !show);
+
+            if(show) visible++;
+
+        });
+
+        document.getElementById('noResults').style.display =
+            visible === 0 ? 'block' : 'none';
+
+        document.getElementById('visibleCount').textContent =
+            'Showing ' + visible + ' notifications';
+
+    };
+
+    window.setFilter = function(filter, button){
+
+        currentFilter = filter;
+
+        document.querySelectorAll('.filter-btn')
+            .forEach(btn => btn.classList.remove('active'));
+
+        button.classList.add('active');
+
+        applyFilters();
+    };
+
+    window.markRead = function(button){
+
+        const item = button.closest('.notification-item');
+
+        item.classList.remove('unread');
+
+        item.querySelector('.read-label').textContent = '✓ READ';
+
+        const ids = getReadIds();
+
+        if(!ids.includes(item.dataset.id)){
+            ids.push(item.dataset.id);
+        }
+
+        saveReadIds(ids);
+
+        updateStats();
+        applyFilters();
+    };
+
+    window.markAllRead = function(){
+
+        const ids = getReadIds();
+
+        items().forEach(item => {
+
+            item.classList.remove('unread');
+
+            item.querySelector('.read-label').textContent = '✓ READ';
+
+            if(!ids.includes(item.dataset.id)){
+                ids.push(item.dataset.id);
+            }
+
+        });
+
+        saveReadIds(ids);
+
+        updateStats();
+        applyFilters();
+
+    };
+
+    window.clearRead = function(){
+
+        if(!confirm('Clear all read notifications from this view?')){
+            return;
+        }
+
+        items().forEach(item => {
+
+            if(!item.classList.contains('unread')){
+                item.remove();
+            }
+
+        });
+
+        // Rebuild saved read IDs from remaining notifications
+        const remainingIds = items()
+            .filter(item => !item.classList.contains('unread'))
+            .map(item => item.dataset.id);
+
+        saveReadIds(remainingIds);
+
+        updateStats();
+        applyFilters();
+
+    };
+
+    window.sortNotifications = function(){
+
+        const order = document.getElementById('sortOrder').value;
+
+        const sorted = items().sort((a,b) => {
+
+            const dateA = Date.parse(a.dataset.date) || 0;
+            const dateB = Date.parse(b.dataset.date) || 0;
+
+            return order === 'newest'
+                ? dateB - dateA
+                : dateA - dateB;
+
+        });
+
+        sorted.forEach(item => list.appendChild(item));
+
+    };
+
+    window.exportCSV = function(){
+
+        const rows = [
+            ['Notification','Date','Status']
+        ];
+
+        items().forEach(item => {
+
+            rows.push([
+                item.dataset.message,
+                item.dataset.date,
+                item.classList.contains('unread') ? 'Unread' : 'Read'
+            ]);
+
+        });
+
+        const csv = rows.map(row =>
+            row.map(value =>
+                '"' + String(value).replace(/"/g,'""') + '"'
+            ).join(',')
+        ).join('\n');
+
+        const blob = new Blob(
+            ['\uFEFF' + csv],
+            {type:'text/csv;charset=utf-8;'}
+        );
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = 'KIZA_AGRI_Notifications.csv';
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+    };
+
+    restoreRead();
+
+})();
+</script>
+
+{% endblock %}

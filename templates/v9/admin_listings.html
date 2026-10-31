@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block title %}Marketplace admin · KIZA-AGRI{% endblock %}{% block body %}
+<div class="hero2 adm"><div><h1>🛒 Marketplace control</h1><p>Review every listing. Remove anything wrong or restore it.</p></div></div>
+<div class="tabs">{% for k,l in [('','All'),('live','Live'),('pending','Awaiting advisor'),('scheduled','Scheduled'),('withdrawn','Removed')] %}<a href="?st={{ k }}" class="{{ 'on' if st==k }}">{{ l }}</a>{% endfor %}</div>
+<div class="sec"><div class="tw"><table><tr><th>#</th><th>Crop</th><th>Farmer</th><th>Where</th><th>kg</th><th>RWF/kg</th><th>Harvest date</th><th>Check</th><th>Status</th><th></th></tr>
+{% for l in rows %}<tr><td>{{ l.id }}</td><td>{{ l.crop }}</td><td>{{ l.seller }}<div class="mut">{{ l.sphone or '' }}</div></td><td>{{ l.district }} · {{ l.sector or '' }}</td><td>{{ l.available_kg|round|int }} / {{ l.qty_kg|round|int }}</td><td>{{ l.price_kg|round|int }}</td><td>{{ l.harvest_date or '–' }}</td><td>{{ l.verify_status }}</td><td><span class="tag">{{ l.status }}</span></td>
+<td><form method="post">{{ csrf_input() }}<input type="hidden" name="id" value="{{ l.id }}">{% if l.status=='Withdrawn' %}<button class="sm" name="act" value="restore">Restore</button>{% else %}<button class="sm bad" name="act" value="withdraw" onclick="return confirm('Remove this listing?')">Remove</button>{% endif %}</form></td></tr>{% else %}<tr><td colspan="10" class="mut">Nothing here.</td></tr>{% endfor %}</table></div></div>
+{% endblock %}

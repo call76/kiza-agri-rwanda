@@ -1,0 +1,1 @@
+[["^Welcome back, (.+?)( 👋)?$", "Murakaza neza, \\1\\2"], ["^Welcome, (.+)$", "Murakaza neza, \\1"], ["^Advice for (.+)$", "Inama ku \\1"], ["^Village advisor — (.+)$", "Umujyanama w'umudugudu — \\1"]]

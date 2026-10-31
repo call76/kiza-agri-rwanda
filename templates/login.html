@@ -1,0 +1,12 @@
+{% extends 'v11/authbase.html' %}{% block title %}{{ t('Login') }} · KIZA-AGRI{% endblock %}
+{% block hero %}{{ L('Your farm,','Umurima wawe,','Votre ferme,') }}<br><span>{{ L('smarter.','mu buryo bwa none.','plus intelligente.') }}</span>{% endblock %}
+{% block sheet %}<h2>{{ t('Welcome back') }} 👋</h2><p class="av-sub">{{ L('Log in to check on your fields, prices and harvest.','Injira urebe imirima yawe, ibiciro n’isarura.','Connectez-vous pour voir champs, prix et récoltes.') }}</p>
+{% for c,m in get_flashed_messages(with_categories=true) %}<div class="av-fl {{c}}" role="alert">{{ m|tm }}</div>{% endfor %}
+<form method="post" autocomplete="on" class="av-form" id="lf">{{ csrf_input() }}
+<label class="av-in"><i>📱</i><input name="ident" placeholder="{{ t('Phone or email') }} (0788 123 456)" autocomplete="username" required autofocus><span class="lb">{{ t('Phone or email') }}</span></label>
+<label class="av-in"><i>🔒</i><input name="password" id="p" type="password" placeholder="{{ t('Password') }}" autocomplete="current-password" required><span class="lb">{{ t('Password') }}</span><button type="button" class="eye" data-eye aria-label="{{ t('Show') }}">👁</button></label>
+<div class="av-row"><a href="/forgot">{{ T('sec.forgot_link') }}</a></div>
+<button class="go av-btn" type="submit"><span class="tx">{{ t('Login') }}</span><span class="ar">→</span><span class="sp" aria-hidden="true"></span></button></form>
+<p class="av-alt">{{ t('New here?') }} <a href="/register">{{ t('Create account') }}</a></p>
+<div class="av-or"><span>{{ L('or','cyangwa','ou') }}</span></div>
+<p class="av-alt sm"><a href="/">← {{ L('Home','Ahabanza','Accueil') }}</a> · <a href="/support">{{ t('Help center') }}</a></p>{% endblock %}

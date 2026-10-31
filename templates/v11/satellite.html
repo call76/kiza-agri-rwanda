@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block title %}{{ L('Satellite','Satellite','Satellite') }} · KIZA-AGRI{% endblock %}{% block body %}
+<div class="v11-h"><h1>🛰️ {{ L('Your farm from space','Umurima wawe uturutse mu kirere','Votre ferme vue du ciel') }}</h1><p>{{ L('Real satellite imagery (Esri World Imagery). Use your phone GPS to find your farm. Needs internet.','Amashusho nyayo ya satellite (Esri World Imagery). Koresha GPS ya telefone urebe umurima wawe. Bisaba internet.','Imagerie satellite réelle (Esri). Utilisez le GPS.') }}</p></div>
+<div class="card" style="padding:16px"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<select id="sd" aria-label="District">{% for d in ds %}<option value="{{ d.name }}" data-lat="{{ d.lat }}" data-lng="{{ d.lng }}" {{ 'selected' if d.name==start }}>{{ d.name }}</option>{% endfor %}</select>
+<button class="btn sm" id="gps" type="button">📍 {{ L('My location','Aho ndi (GPS)','Ma position') }}</button>
+<button class="btn sm" id="zm" type="button">−</button><b id="zl"></b><button class="btn sm" id="zp" type="button">+</button>
+<button class="btn sm" id="nd" type="button">🌿 {{ L('Vegetation tint','Ibara ry\'ibimera','Teinte végétation') }}</button></div>
+<div id="grid" style="position:relative;margin:16px auto 0;max-width:768px;aspect-ratio:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;border-radius:18px;background:#0b3d24"><i style="position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px;border:2px solid #d4af37;border-radius:50%;background:#d4af3766;z-index:2"></i></div>
+<p id="warn" hidden style="margin:10px 0;padding:8px 12px;border-radius:10px;background:#f59e0b22;border:1px solid #f59e0b88;font-size:13px;text-align:center">⚠️ {{ L('Illustrative colour filter only — NOT a measurement of crop health.','Ibi ni ibara cyerekana gusa — si ipimwa ry\'ubuzima bw\'ibihingwa.','Filtre illustratif — PAS une mesure de santé des cultures.') }}</p>
+<p id="co" style="text-align:center;font-size:12px;opacity:.7;margin:8px 0 0"></p><p style="text-align:center;font-size:12px;opacity:.6;margin:2px">Esri, Maxar, Earthstar Geographics</p></div>
+<script>(function(){var s=document.getElementById('sd'),g=document.getElementById('grid'),z=15,pos,nd=false;
+function init(){var o=s.selectedOptions[0];pos=[+o.dataset.lat,+o.dataset.lng];draw()}
+function tile(la,lo,z){var n=Math.pow(2,z),r=la*Math.PI/180;return{x:Math.floor((lo+180)/360*n),y:Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n)}}
+function draw(){var t=tile(pos[0],pos[1],z);[].slice.call(g.querySelectorAll('img')).forEach(function(i){i.remove()});
+for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){var im=new Image();im.alt='Satellite';im.loading='lazy';im.style.cssText='width:100%;height:100%;object-fit:cover;display:block'+(nd?';filter:saturate(3) hue-rotate(-25deg) contrast(1.4)':'');im.src='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'+z+'/'+(t.y+dy)+'/'+(t.x+dx);g.insertBefore(im,g.querySelector('i'))}
+document.getElementById('zl').textContent='Zoom '+z;document.getElementById('co').textContent=pos[0].toFixed(4)+', '+pos[1].toFixed(4);document.getElementById('warn').hidden=!nd}
+s.onchange=init;document.getElementById('zm').onclick=function(){z=Math.max(10,z-1);draw()};document.getElementById('zp').onclick=function(){z=Math.min(18,z+1);draw()};
+document.getElementById('nd').onclick=function(){nd=!nd;draw()};document.getElementById('gps').onclick=function(){navigator.geolocation&&navigator.geolocation.getCurrentPosition(function(p){pos=[p.coords.latitude,p.coords.longitude];draw()})};init()})();</script>{% endblock %}

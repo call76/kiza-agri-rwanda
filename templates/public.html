@@ -1,0 +1,5 @@
+<!doctype html><html lang="{{ lang }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}KIZA-AGRI{% endblock %} · KIZA-AGRI</title><link rel="stylesheet" href="/static/landing.css"><link rel="stylesheet" href="/static/ui.css"><link rel="stylesheet" href="/static/v10.css"><link rel="stylesheet" href="/static/magic.css"><script src="/static/magic.js" defer></script></head><body class="lp">
+{% include '_pubhead.html' %}
+<section class="ph" style="padding:64px 0 54px"><div class="wrap"><span class="eyebrow" style="color:#ffc933">{% block eyebrow %}{% endblock %}</span><h1>{% block h1 %}{% endblock %}</h1><p>{% block lead %}{% endblock %}</p></div></section>
+<div class="pg"><div class="wrap">{% for c,m in get_flashed_messages(with_categories=true) %}<div class="fl2 {{c}}">{{ m|tm }}</div>{% endfor %}{% block page %}{% endblock %}</div></div>
+{% include '_pubfoot.html' %}{% include '_widgets.html' %}</body></html>

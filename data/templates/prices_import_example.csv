@@ -1,0 +1,2 @@
+crop,district,market,price_type,unit,price_rwf,observed_on,source,source_url,verified,simulated
+Maize,Musanze,Musanze Market,retail,kg,0,2026-09-01,EXAMPLE ROW (rejected: price 0 is not a price),,0,1

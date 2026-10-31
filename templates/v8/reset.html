@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block body %}<h1>🔒 {{ T('sec.reset_title') }}</h1>
+{% if valid %}<div class="card"><form method="post">{{ csrf_input() }}<label for="p1">{{ T('sec.new_pw') }}</label><input id="p1" name="password" type="password" required minlength="8" autocomplete="new-password"><label for="p2">{{ T('sec.confirm_pw') }}</label><input id="p2" name="password2" type="password" required minlength="8" autocomplete="new-password"><p class="mut">{{ T('sec.pw_rules') }}</p><p><button>{{ T('sec.set_pw') }}</button></p></form></div>
+{% else %}<div class="card empty"><p>{{ T('sec.link_invalid') }}</p><p><a class="btn" href="/forgot">{{ T('sec.request_new') }}</a></p></div>{% endif %}{% endblock %}

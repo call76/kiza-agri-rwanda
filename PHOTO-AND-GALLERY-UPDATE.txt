@@ -1,0 +1,10 @@
+KIZA AGRI RWANDA - PHOTO/GALLERY UPDATE
+
+- Added a full Kiza Agri promotional collage and 11 individual reusable image assets
+  under static/photos/.
+- Added an offline/local photo grid to templates/_gallery.html for crops, soil,
+  planting, harvest, digital agriculture, markets and farmer community.
+- Existing hero.jpg remains available at static/photos/hero.jpg.
+- All added generated visuals are illustrative AI images, not documentary photos.
+- Python source syntax compilation passed. Full application/runtime and browser tests
+  were not run in this packaging environment.
