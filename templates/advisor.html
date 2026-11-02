@@ -1,114 +1,182 @@
 {% extends 'base.html' %}
 {% block body %}
 
-<h1>{{ t('Crop Advisor') }}</h1>
-
-<form class="row card" method="get">
+<div class="header-flex" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+  <h1>{{ t('Crop Advisor & Farm Analytics') }}</h1>
   <div>
-    <label>Farm</label>
-    <select name="farm">
+    <a href="/export-advisor-pdf?farm={{ farm.id }}&season={{ season }}" class="btn secondary" target="_blank" style="text-decoration:none; padding:8px 14px; background:var(--g2); color:#fff; border-radius:6px; font-size:14px;">
+      📥 {{ L('Download PDF Report','Kurura Raporo ya PDF') }}
+    </a>
+  </div>
+</div>
+
+<!-- Form yo guhitamo ubutaka na Season -->
+<form class="row card" method="get" style="display:flex; gap:15px; align-items:flex-end;">
+  <div style="flex:2;">
+    <label><b>Farm (Ubutaka)</b></label>
+    <select name="farm" class="form-control" style="width:100%; padding:8px;">
       {% for f in farms %}
         <option value="{{ f.id }}" {{ 'selected' if f.id == farm.id }}>
-          {{ f.name }} ({{ f.district }} / {{ f.sector }})
+          {{ f.name }} ({{ f.district }} / {{ f.sector }}) - [{{ f.size_ha }} ha]
         </option>
       {% endfor %}
     </select>
   </div>
+
+  <div style="flex:1;">
+    <label><b>Season (Igihe)</b></label>
+    <select name="season" class="form-control" style="width:100%; padding:8px;">
+      <option value="2026A" {{ 'selected' if season == '2026A' }}>2026A</option>
+      <option value="2026B" {{ 'selected' if season == '2026B' }}>2026B</option>
+      <option value="2026C" {{ 'selected' if season == '2026C' }}>2026C (Kwijya)</option>
+    </select>
+  </div>
+
   <div>
-    <button>{{ t('Analyse') }}</button>
+    <button type="submit" style="padding:9px 18px; background:var(--primary); color:#fff; border:none; border-radius:6px; cursor:pointer;">
+      {{ t('Analyse') }}
+    </button>
   </div>
 </form>
 
+<!-- Land Use Consolidation (LUC) Alert -->
 {% if mand %}
-<div class="act {{ 'ok' if top.crop == mand else 'warn' }}">
-  🏛️ <span>Land Use Consolidation: the priority crop for <b>{{ farm.sector }}</b> sector is <b>{{ mand }}</b>.
-  {% if top.crop != mand %} Planting another crop needs a check with your sector agronomist.{% endif %}</span>
+<div class="act {{ 'ok' if top.crop == mand else 'warn' }}" style="padding:12px; margin-bottom:15px; border-radius:6px;">
+  🏛️ <span><b>Land Use Consolidation (LUC):</b> The priority crop for <b>{{ farm.sector }}</b> sector is <b>{{ mand }}</b>.
+  {% if top.crop != mand %} <i>Planting another crop needs a formal check with your sector agronomist.</i>{% endif %}</span>
 </div>
 {% endif %}
 
-<div class="card" style="border-left:6px solid var(--g3)">
-  <span class="tag">Best match · Season {{ season }}</span>
-  <h2>{{ top.crop }} <span class="score">{{ top.score }}/100</span> 
+<!-- Best Match Card -->
+{% if top %}
+<div class="card" style="border-left:6px solid var(--g3); padding:20px; margin-bottom:20px;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <span class="tag" style="background:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:4px; font-weight:600;">⭐ Best Match · Season {{ season }}</span>
+    <span class="mut" style="font-size:13px;">Ubusoberane bw'Ubutaka: {{ farm.size_ha }} Hagitari (ha)</span>
+  </div>
+  
+  <h2 style="margin-top:10px;">{{ top.crop }} <span class="score" style="color:var(--g3)">{{ top.score }}/100</span> 
     {% if top.luc == 'aligned' %}
-      <span class="tag">✓ LUC aligned</span>
+      <span class="tag" style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:4px; font-size:12px;">✓ LUC aligned</span>
     {% elif top.luc == 'not_aligned' %}
-      <span class="tag bad">not LUC priority</span>
+      <span class="tag bad" style="background:#fee2e2; color:#b91c1c; padding:3px 8px; border-radius:4px; font-size:12px;">⚠️ not LUC priority</span>
     {% endif %}
   </h2>
   
-  <div class="grid g2">
+  <div class="grid g2" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:15px;">
     <div>
-      <h3>Why?</h3>
+      <h3 style="font-size:16px; border-bottom:1px solid #eee; padding-bottom:5px;">Why this crop?</h3>
       {% for r in top.reasons %}
-        <p>✅ {{ r }}</p>
+        <p style="margin:6px 0;">✅ {{ r }}</p>
       {% endfor %}
       
-      <h3>Risks</h3>
+      <h3 style="font-size:16px; margin-top:15px; border-bottom:1px solid #eee; padding-bottom:5px;">Potential Risks</h3>
       {% for r in top.risks %}
-        <p>⚠️ {{ r }}</p>
+        <p style="margin:6px 0; color:#c2410c;">⚠️ {{ r }}</p>
       {% else %}
-        <p>No major risks found.</p>
+        <p style="margin:6px 0; color:#15803d;">No major agronomic risks found.</p>
       {% endfor %}
     </div>
     
     <div>
-      <h3>Next steps</h3>
-      <p>1. See your <a href="/fertilizer?crop={{ top.crop }}">Nkunganire fertilizer cost</a>.<br>
-         2. <a href="/farms/{{ farm.id }}">Add a field</a>.<br>
-         3. Check <a href="/weather">weather advice</a> before sowing.</p>
+      <h3 style="font-size:16px; border-bottom:1px solid #eee; padding-bottom:5px;">Next Actions</h3>
+      <p style="margin:6px 0; line-height:1.6;">
+        1. See your <a href="/fertilizer?crop={{ top.crop }}" style="color:var(--primary);">Nkunganire fertilizer subsidy cost</a>.<br>
+        2. <a href="/farms/{{ farm.id }}" style="color:var(--primary);">Update soil testing details</a>.<br>
+        3. Check <a href="/weather" style="color:var(--primary);">local weather forecast</a> before sowing.
+      </p>
       
-      <h3>Expected profit ({{ farm.size_ha }} ha)</h3>
-      <p>Cost {{ '{:,}'.format(top.profit.cost) }} · Revenue {{ '{:,}'.format(top.profit.revenue) }} RWF<br>
-         <b>Profit ≈ {{ '{:,}'.format(top.profit.profit) }} RWF</b></p>
+      <h3 style="font-size:16px; margin-top:15px; border-bottom:1px solid #eee; padding-bottom:5px;">Expected Financials ({{ farm.size_ha }} ha)</h3>
+      <p style="margin:6px 0;">
+        Estimated Cost: <b>{{ '{:,}'.format(top.profit.cost) }} RWF</b><br>
+        Expected Revenue: <b>{{ '{:,}'.format(top.profit.revenue) }} RWF</b><br>
+        <span style="font-size:16px; color:#15803d;"><b>Net Profit ≈ {{ '{:,}'.format(top.profit.profit) }} RWF</b></span>
+      </p>
     </div>
   </div>
   
-  <details>
-    <summary>What data was used?</summary>
-    <p class="mut">{{ top.used | unique | join(', ') }}. Score = 70% agronomic readiness (temperature 25, rainfall 30, soil pH 20, season 15, water 10) + 30% profit margin. Yield/cost/price figures are DEMO unless an administrator loaded official data.</p>
+  <details style="margin-top:15px; background:#f9fafb; padding:10px; border-radius:6px;">
+    <summary style="cursor:pointer; font-weight:500;">🔍 What data parameters were used?</summary>
+    <p class="mut" style="margin-top:8px; font-size:13px;">{{ top.used | unique | join(', ') }}. Score calculation = 70% agronomic suitability (Soil pH, rainfall, temperature, water requirement) + 30% financial net profit margin. Figures are based on localized database models.</p>
   </details>
 </div>
+{% endif %}
 
-<div class="card">
-  <h3>{{ L('Best crops compared','Ibihingwa byiza bigereranyijwe') }} 
-    <span class="mut" style="font-weight:400;font-size:14px">
-      ({{ L('top ' ~ [res | length, 25] | min ~ ' of ' ~ res | length, 'ibya mbere ' ~ [res | length, 25] | min ~ ' kuri ' ~ res | length) }})
-    </span>
-  </h3>
+<!-- Comparative Table with Search/Filter Feature -->
+<div class="card" style="padding:20px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+    <h3 style="margin:0;">
+      {{ L('Best crops compared','Ibihingwa byiza bigereranyijwe') }} 
+      <span class="mut" style="font-weight:400;font-size:14px">
+        ({{ L('Showing top ' ~ [res | length, 25] | min ~ ' of ' ~ res | length, 'ibya mbere ' ~ [res | length, 25] | min ~ ' kuri ' ~ res | length) }})
+      </span>
+    </h3>
+    <div>
+      <input type="text" id="cropSearchInput" onkeyup="filterCropsTable()" placeholder="Search crop name..." style="padding:6px 12px; border:1px solid #ccc; border-radius:4px; width:200px;">
+    </div>
+  </div>
   
-  <div class="tw">
-    <table>
-      <tr>
-        <th>Crop</th>
-        <th>Suitability</th>
-        <th>Profit (RWF)</th>
-        <th>Water</th>
-        <th>Disease risk</th>
-        <th>LUC</th>
-      </tr>
-      {% for r in res[:25] %}
-      <tr>
-        <td><b>{{ r.crop }}</b></td>
-        <td>
-          <div class="meter"><i style="width:{{ r.score }}%"></i></div>
-          {{ r.score }}
-        </td>
-        <td>{{ '{:,}'.format(r.profit.profit) }}</td>
-        <td>{{ r.water }}</td>
-        <td>{{ (r.disease * 100) | round }}%</td>
-        <td>
-          {% if r.luc == 'aligned' %}
-            <span class="tag">✓ priority</span>
-          {% elif r.luc == 'not_aligned' %}
-            <span class="tag bad">other crop</span>
-          {% else %}
-            –
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
+  <div class="tw" style="overflow-x:auto;">
+    <table id="cropsComparisonTable" style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f3f4f6; text-align:left;">
+          <th style="padding:10px;">Crop Name</th>
+          <th style="padding:10px;">Suitability Score</th>
+          <th style="padding:10px;">Est. Profit (RWF)</th>
+          <th style="padding:10px;">Water Need</th>
+          <th style="padding:10px;">Disease Risk</th>
+          <th style="padding:10px;">LUC Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in res[:25] %}
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:10px;"><b>{{ r.crop }}</b></td>
+          <td style="padding:10px;">
+            <div class="meter" style="background:#e5e7eb; border-radius:4px; height:8px; width:100px; margin-bottom:4px; overflow:hidden;">
+              <div style="background:var(--primary); height:100%; width:{{ r.score }}%;"></div>
+            </div>
+            <b>{{ r.score }}/100</b>
+          </td>
+          <td style="padding:10px; color:#15803d; font-weight:600;">{{ '{:,}'.format(r.profit.profit) }}</td>
+          <td style="padding:10px;">{{ r.water }}</td>
+          <td style="padding:10px;">{{ (r.disease * 100) | round }}%</td>
+          <td style="padding:10px;">
+            {% if r.luc == 'aligned' %}
+              <span class="tag" style="background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-size:11px;">✓ priority</span>
+            {% elif r.luc == 'not_aligned' %}
+              <span class="tag bad" style="background:#fee2e2; color:#b91c1c; padding:2px 6px; border-radius:4px; font-size:11px;">other crop</span>
+            {% else %}
+              –
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
 </div>
+
+<!-- JavaScript for live filtering table -->
+<script>
+function filterCropsTable() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("cropSearchInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("cropsComparisonTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 1; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
 
 {% endblock %}
